@@ -16,4 +16,7 @@ class HomeController @Inject() (val controllerComponents: ControllerComponents) 
   def index(): Action[AnyContent] = Action {
     Ok(views.html.index())
   }
+  def hello(name: String): Action[AnyContent] = Action {
+    Ok(views.html.hello(name))
+  }
 }
