@@ -8,7 +8,7 @@ import play.api.mvc._
 import services.AdminService
 import util.{ControllerJson, EitherF}
 
-import scala.concurrent.{ExecutionContext, Future}
+import scala.concurrent.{ExecutionContext}
 
 @Singleton
 class AdminController @Inject() (val controllerComponents: ControllerComponents, adminService: AdminService)(implicit ec: ExecutionContext)
