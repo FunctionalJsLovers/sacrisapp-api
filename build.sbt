@@ -26,3 +26,13 @@ libraryDependencies ++= Seq("slick-pg", "slick-pg_play-json", "slick-pg_jts_lt")
 
 // https://typelevel.org/cats/
 libraryDependencies += "org.typelevel" %% "cats-core" % "2.9.0"
+
+
+//Auth0
+
+libraryDependencies ++= Seq(
+  "com.github.jwt-scala" % "jwt-core_2.13" % "9.4.4",
+  "com.github.jwt-scala" % "jwt-play_2.13" % "9.4.4",
+  "com.github.jwt-scala" % "jwt-play-json_2.13" % "9.4.4",
+  "com.auth0" % "jwks-rsa" % "0.6.1"
+)

@@ -1,5 +1,6 @@
 package controllers
 
+import auth.AuthAction
 import models.Admin
 
 import javax.inject._
@@ -8,14 +9,15 @@ import play.api.mvc._
 import services.AdminService
 import util.{ControllerJson, EitherF}
 
-import scala.concurrent.{ExecutionContext}
+import scala.concurrent.ExecutionContext
 
 @Singleton
-class AdminController @Inject() (val controllerComponents: ControllerComponents, adminService: AdminService)(implicit ec: ExecutionContext)
-    extends BaseController
+class AdminController @Inject() (val controllerComponents: ControllerComponents, adminService: AdminService, authAction: AuthAction)(implicit
+    ec: ExecutionContext
+) extends BaseController
     with ControllerJson {
 
-  def indexAll: Action[AnyContent] = Action.async { implicit request =>
+  def indexAll: Action[AnyContent] = authAction.async { implicit request =>
     EitherF.response(
       for {
         admins <- EitherF.right(adminService.listAdmins)
