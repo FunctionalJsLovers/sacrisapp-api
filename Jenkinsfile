@@ -5,21 +5,21 @@ pipeline {
         stage('Compile') {
             steps {
                 echo "Compiling..."
-                sh "/usr/local/bin/sbt compile"
+                sh "sbt compile -J-Xmx1280M"
             }
         }
 
         stage('Test') {
             steps {
                 echo "Testing..."
-                sh "/usr/local/bin/sbt test"
+                sh "sbt compile  -J-Xmx1280M"
             }
         }
 
         stage('Package') {
             steps {
                 echo "Packaging..."
-                sh "/usr/local/bin/sbt package"
+                sh "sbt package -J-Xmx1280M"
             }
         }
 
