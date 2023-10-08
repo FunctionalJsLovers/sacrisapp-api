@@ -39,4 +39,4 @@ libraryDependencies ++= Seq(
 )
 
 //Packaging
-maintainer := "gojidet@sacrisapp.org"
+maintainer := "gojideth@sacrisapp.org"
