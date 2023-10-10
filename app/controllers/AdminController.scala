@@ -32,7 +32,17 @@ class AdminController @Inject() (val controllerComponents: ControllerComponents,
       } yield Ok(AdminResponse(admins))
     )
   }
+
+  def addAdmin: Action[Admin.Create] = authAction.async(parse.json[Admin.Create]) { implicit request =>
+    val body = request.body
+    EitherF.response(
+      for {
+        admin <- EitherF.right(adminService.addAdmin(body))
+      } yield Ok(AdminResponse(Seq(request.body)))
+    )
+  }
   private case class AdminResponse(admins: Seq[Admin])
   private implicit val adminResponseWrites: OWrites[AdminResponse] = Json.writes[AdminResponse]
+
 
 }

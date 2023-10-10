@@ -26,7 +26,6 @@ class DBService @Inject() (protected val dbConfigProvider: DatabaseConfigProvide
       }
       db.run(actionWithTimeout).recover {
         case error: PSQLException if error.getMessage == "ERROR: canceling statement due to user request" =>
-          // SP-3587: Assuming an error with this message is the result of a query hitting the specified timeout. Not sure why this isn't the default behavior.
           throw new SQLTimeoutException(error)
       }
     }
