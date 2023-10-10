@@ -16,8 +16,6 @@ class AdminRouter @Inject() (
     appointmentController: AppointmentController,
     sessionController: SessionController
 ) extends SimpleRouter {
-class AdminRouter @Inject() (adminController: AdminController, artistController: ArtistController, categoryController: CategoryController)
-    extends SimpleRouter {
 
   override def routes: Routes = {
     artistsRoutes orElse
@@ -27,6 +25,7 @@ class AdminRouter @Inject() (adminController: AdminController, artistController:
       appointmentsRoutes orElse
       sessionRoutes
   }
+
   private val adminRoutes: Routes = {
     case GET(p"/health") =>
       adminController.test
@@ -82,5 +81,4 @@ class AdminRouter @Inject() (adminController: AdminController, artistController:
     case GET(p"/sessions") =>
       sessionController.indexAll()
   }
-
 }
