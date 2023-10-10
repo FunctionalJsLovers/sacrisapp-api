@@ -9,15 +9,14 @@ import javax.inject.Inject
 class AdminRouter @Inject() (adminController: AdminController) extends SimpleRouter {
 
   override def routes: Routes = {
-    adminRoutes orElse
-      artistsRoutes
+    artistsRoutes orElse
+    adminRoutes
   }
-
   private val adminRoutes: Routes = { case GET(p"/admins") =>
     adminController.indexAll
   }
 
-  private val artistsRoutes: Routes = { case GET(p"/artists/") =>
+  private val artistsRoutes: Routes = { case GET(p"/artists") =>
     adminController.test
   }
 
