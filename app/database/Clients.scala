@@ -15,8 +15,8 @@ object Clients {
   import PostgresProfile.api._
   val ClientsTable = TableQuery[ClientsTableDef]
 
-  class ClientsTableDef(tag: Tag) extends Table[Client](tag, "clients") {
-    def id: Rep[UUID] = column[UUID]("id", O.PrimaryKey)
+  class ClientsTableDef(tag: Tag) extends Table[ClientRow](tag, "clients") {
+    def id: Rep[UUID] = column[UUID]("client_id", O.PrimaryKey)
 
     def name: Rep[String] = column[String]("name")
 
@@ -24,7 +24,22 @@ object Clients {
 
     def email: Rep[String] = column[String]("email")
 
-    override def * : ProvenShape[Client] = (id, name, phone, email).<>((Client.apply _).tupled, Client.unapply)
+    override def * : ProvenShape[ClientRow] = (id, name, phone, email).mapTo[ClientRow]
 
+  }
+
+  case class ClientRow(
+      id: UUID,
+      name: String,
+      phone: String,
+      email: String
+  ) extends Product
+      with Serializable {
+    def toClient: Client = Client(
+      id,
+      name,
+      phone,
+      email
+    )
   }
 }

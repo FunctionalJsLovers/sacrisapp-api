@@ -17,7 +17,7 @@ object Appointments {
   import PostgresProfile.api._
   val AppointmentsTable = TableQuery[AppointmentsTableDef]
 
-  class AppointmentsTableDef(tag: Tag) extends Table[Appointment](tag, "appointments") {
+  class AppointmentsTableDef(tag: Tag) extends Table[AppointmentRow](tag, "appointments") {
     def id: Rep[UUID] = column[UUID]("appointment_id", O.PrimaryKey)
 
     def description: Rep[String] = column[String]("description")
@@ -26,10 +26,27 @@ object Appointments {
 
     def clientId: Rep[UUID] = column[UUID]("client_id_fk")
 
-    def categoryId: Rep[UUID] = column[UUID]("category_id_fk")
+    def categoryId: Rep[UUID] = column[UUID]("artist_category_id")
 
-    override def * : ProvenShape[Appointment] = (id, description, artistId, clientId, categoryId)
-      .<>((Appointment.apply _).tupled, Appointment.unapply)
+    override def * : ProvenShape[AppointmentRow] = (id, description, artistId, clientId, categoryId)
+      .mapTo[AppointmentRow]
 
+  }
+
+  case class AppointmentRow(
+      id: UUID,
+      description: String,
+      artistId: UUID,
+      clientId: UUID,
+      categoryId: UUID
+  ) extends Product
+      with Serializable {
+    def toAppointment: Appointment = Appointment(
+      id,
+      description,
+      artistId,
+      clientId,
+      categoryId
+    )
   }
 }
