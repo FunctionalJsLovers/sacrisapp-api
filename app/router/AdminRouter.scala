@@ -1,5 +1,6 @@
 package router
 
+import controllers.{AdminController, ArtistController, CategoryController}
 import controllers.{AdminController, AppointmentController, ArtistController, CategoryController, ClientController, SessionController}
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
@@ -15,6 +16,8 @@ class AdminRouter @Inject() (
     appointmentController: AppointmentController,
     sessionController: SessionController
 ) extends SimpleRouter {
+class AdminRouter @Inject() (adminController: AdminController, artistController: ArtistController, categoryController: CategoryController)
+    extends SimpleRouter {
 
   override def routes: Routes = {
     artistsRoutes orElse
