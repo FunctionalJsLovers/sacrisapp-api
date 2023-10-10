@@ -1,19 +1,24 @@
 package router
 
-import controllers.{AdminController, ArtistController, CategoryController}
+import controllers.{AdminController, ArtistController, CategoryController, ClientController}
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import play.api.routing.sird._
 
 import javax.inject.Inject
 
-class AdminRouter @Inject() (adminController: AdminController, artistController: ArtistController, categoryController: CategoryController)
-    extends SimpleRouter {
+class AdminRouter @Inject() (
+    adminController: AdminController,
+    artistController: ArtistController,
+    categoryController: CategoryController,
+    clientController: ClientController
+) extends SimpleRouter {
 
   override def routes: Routes = {
     artistsRoutes orElse
       adminRoutes orElse
-      categoriesRoutes
+      categoriesRoutes orElse
+      clientsRoutes
   }
   private val adminRoutes: Routes = {
     case GET(p"/health") =>
@@ -44,6 +49,15 @@ class AdminRouter @Inject() (adminController: AdminController, artistController:
       categoryController.createArtistCategory()
     case GET(p"/artistCategories") =>
       categoryController.listArtistCategories()
+  }
+
+  private val clientsRoutes: Routes = {
+    case GET(p"/clients") =>
+      clientController.indexAll()
+    case POST(p"/clients") =>
+      clientController.addClient()
+    case GET(p"/clients/$name") =>
+      clientController.listClient(name)
   }
 
 }
