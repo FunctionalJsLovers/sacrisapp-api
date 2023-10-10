@@ -1,7 +1,5 @@
 package utils
 
-package util
-
 import com.github.tminglei.slickpg._
 import org.locationtech.jts.geom.Geometry
 import play.api.libs.json._
@@ -55,8 +53,6 @@ trait PostgresProfile extends ExPostgresProfile with PgDate2Support with PgPlayJ
 
       def union(g2: Rep[Option[Geometry]]): Rep[Option[Geometry]] = SimpleFunction[Option[Geometry]]("ST_Union").apply(Seq(geometry, g2))
     }
-
-
 
     implicit val simpleStrSeqTypeMapper: SimpleArrayJdbcType[String] = new SimpleArrayJdbcType[String]("text")
     implicit val localDateTimeWitness: ElemWitness[LocalDateTime] = ElemWitness.AnyWitness.asInstanceOf[ElemWitness[LocalDateTime]]

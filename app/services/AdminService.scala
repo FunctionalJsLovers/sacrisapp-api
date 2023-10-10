@@ -18,19 +18,22 @@ class AdminService @Inject() (dbService: DBService)(implicit ec: ExecutionContex
       .filter(_.name === name)
       .result
       .execute()
+      .map(_.map(_.toAdmin))
   }
   def listAdmins: Future[Seq[Admin]] = {
     AdminsTable.result
       .execute()
+      .map(_.map(_.toAdmin))
   }
 
-  def addAdmin(admin: Admin.Create): Future[Int] = {
-    val asAdmin = Admin.Create(admin.name, admin.phone, admin.email)
-    val query = AdminsTable.inserw
-    query.execute()
+  def createAdmin(admin: Admin.Create): Future[Admin] = {
+    val dbActions = for {
+      adminCreated <- AdminsTable.insertWithParameters(createAdminParameters(admin))
+    } yield adminCreated.toAdmin
+    dbActions.transactionally.execute()
   }
 
-  private def createAdminParameters(admin: Admin): Seq[Parameter[AdminsTableDef]] = Seq(
+  private def createAdminParameters(admin: Admin.Create): Seq[Parameter[AdminsTableDef]] = Seq(
     Parameter((_: AdminsTableDef).name, admin.name),
     Parameter((_: AdminsTableDef).email, admin.email),
     Parameter((_: AdminsTableDef).phone, admin.phone)

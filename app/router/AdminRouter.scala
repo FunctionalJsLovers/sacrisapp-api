@@ -10,10 +10,13 @@ class AdminRouter @Inject() (adminController: AdminController) extends SimpleRou
 
   override def routes: Routes = {
     artistsRoutes orElse
-    adminRoutes
+      adminRoutes
   }
-  private val adminRoutes: Routes = { case GET(p"/admins") =>
-    adminController.indexAll
+  private val adminRoutes: Routes = {
+    case GET(p"/admins") =>
+      adminController.indexAll()
+    case POST(p"/admins") =>
+      adminController.addAdmin()
   }
 
   private val artistsRoutes: Routes = { case GET(p"/artists") =>
