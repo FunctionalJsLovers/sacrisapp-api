@@ -40,6 +40,10 @@ class AdminRouter @Inject() (adminController: AdminController, artistController:
       categoryController.indexAll()
     case POST(p"/categories") =>
       categoryController.addCategory()
+    case POST(p"/artistCategories") =>
+      categoryController.createArtistCategory()
+    case GET(p"/artistCategories") =>
+      categoryController.listArtistCategories()
   }
 
 }

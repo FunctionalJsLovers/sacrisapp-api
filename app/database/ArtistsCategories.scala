@@ -1,5 +1,6 @@
 package database
 
+import models.ArtistCategory
 import play.api.db.slick.HasDatabaseConfigProvider
 import slick.jdbc.PostgresProfile
 import slick.lifted.ProvenShape
@@ -12,11 +13,6 @@ trait ArtistsCategories extends HasDatabaseConfigProvider[PostgresProfile] {
 }
 
 object ArtistsCategories {
-  case class ArtistsCategoriesRow(
-      id: UUID,
-      artist_id: UUID,
-      category_id: UUID
-  ) {}
 
   import PostgresProfile.api._
 
@@ -29,5 +25,18 @@ object ArtistsCategories {
 
     override def * : ProvenShape[ArtistsCategoriesRow] = (id, artist_id, category_id).<>(ArtistsCategoriesRow.tupled, ArtistsCategoriesRow.unapply)
 
+  }
+
+  case class ArtistsCategoriesRow(
+      id: UUID,
+      artist_id: UUID,
+      category_id: UUID
+  ) extends Product
+      with Serializable {
+    def toArtistsCategory: ArtistCategory = ArtistCategory(
+      id,
+      artist_id,
+      category_id
+    )
   }
 }
