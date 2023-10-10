@@ -47,3 +47,5 @@ packageSummary := "API for SacrisApp"
 packageDescription := """This is the API that will serve as backend for SacrisAPI"""
 name in Linux := name.value
 rpmVendor := "typesafe"
+rpmLicense := Some("GPL")
+linuxPackageMappings in Rpm := linuxPackageMappings.value
