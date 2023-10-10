@@ -7,6 +7,7 @@ version := "1.0-SNAPSHOT"
 
 lazy val root = (project in file(".")).enablePlugins(PlayScala)
 enablePlugins(JavaAppPackaging)
+enablePlugins(LinuxPlugin)
 
 scalaVersion := "2.13.7"
 scalacOptions ++= Seq(
@@ -39,4 +40,9 @@ libraryDependencies ++= Seq(
 )
 
 //Packaging
+name := "SacrisAPI"
+version := "1.0"
 maintainer := "gojideth@sacrisapp.org"
+packageSummary := "API for SacrisApp"
+packageDescription := """This is the API that will serve as backend for SacrisAPI"""
+name in Linux := name.value
