@@ -1,6 +1,6 @@
 package controllers
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import models.Artist
 import play.api.libs.json.{Json, OWrites}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
@@ -9,6 +9,7 @@ import util.{ControllerJson, EitherF}
 
 import scala.concurrent.ExecutionContext
 
+@Singleton
 class ArtistController @Inject() (val controllerComponents: ControllerComponents, artistService: ArtistService)(implicit ec: ExecutionContext)
     extends BaseController
     with ControllerJson {

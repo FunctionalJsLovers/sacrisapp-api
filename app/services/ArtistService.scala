@@ -1,12 +1,13 @@
 package services
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import database.Artists.{ArtistsTable, ArtistsTableDef}
 import models.Artist
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionContext) {
   import dbService._
   import dbService.api._

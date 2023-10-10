@@ -1,11 +1,12 @@
 package services
 
-import com.google.inject.Inject
+import com.google.inject.{Inject, Singleton}
 import database.Categories.{CategoriesTable, CategoriesTableDef}
 import models.Category
 
 import scala.concurrent.{ExecutionContext, Future}
 
+@Singleton
 class CategoryService @Inject() (dbService: DBService)(implicit ec: ExecutionContext) {
   import dbService._
   import dbService.api._
