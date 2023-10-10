@@ -25,6 +25,14 @@ class AdminController @Inject() (val controllerComponents: ControllerComponents,
     )
   }
 
+  def listAdmin(name: String): Action[AnyContent] = authAction.async { implicit request =>
+    EitherF.response(
+      for {
+        admins <- EitherF.right(adminService.listAdmin(name))
+      } yield Ok(AdminResponse(admins))
+    )
+  }
+
   def test: Action[AnyContent] = Action.async { implicit request =>
     EitherF.response(
       for {
