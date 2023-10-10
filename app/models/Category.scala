@@ -11,4 +11,8 @@ object Category {
   import play.api.libs.json._
 
   implicit val categoryWrites: OWrites[Category] = Json.writes[Category]
+
+  case class Create(name: String) {}
+
+  implicit val categoryCreateReads: Reads[Create] = Json.reads[Create]
 }

@@ -13,14 +13,25 @@ trait Categories extends HasDatabaseConfigProvider[PostgresProfile] {
 }
 
 object Categories {
-  import PostgresProfile.api._
+  import utils.PostgresProfile.api._
   val CategoriesTable = TableQuery[CategoriesTableDef]
 
-  class CategoriesTableDef(tag: Tag) extends Table[Category](tag, "categories") {
+  class CategoriesTableDef(tag: Tag) extends Table[CategoryRow](tag, "categories") {
     def id: Rep[UUID] = column[UUID]("category_id", O.PrimaryKey)
     def name: Rep[String] = column[String]("name")
 
-    override def * : ProvenShape[Category] = (id, name)
-      .<>((Category.apply _).tupled, Category.unapply)
+    override def * : ProvenShape[CategoryRow] = (id, name).mapTo[CategoryRow]
+
+  }
+
+  case class CategoryRow(
+      id: UUID,
+      name: String
+  ) extends Product
+      with Serializable {
+    def toCategory: Category = Category(
+      id,
+      name
+    )
   }
 }
