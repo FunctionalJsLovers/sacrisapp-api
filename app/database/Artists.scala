@@ -20,10 +20,12 @@ object Artists {
     def name: Rep[String] = column[String]("name")
     def phone: Rep[String] = column[String]("phone")
     def email: Rep[String] = column[String]("email")
-
     def adminId: Rep[UUID] = column[UUID]("admin_id_fk")
+    def description: Rep[String] = column[String]("description")
+    def instagram: Rep[String] = column[String]("instagram")
+    def username: Rep[String] = column[String]("username")
 
-    override def * : ProvenShape[ArtistRow] = (id, name, phone, email, adminId).mapTo[ArtistRow]
+    override def * : ProvenShape[ArtistRow] = (id, name, phone, email, adminId, description, instagram, username).mapTo[ArtistRow]
 
   }
   case class ArtistRow(
@@ -31,7 +33,10 @@ object Artists {
       name: String,
       phone: String,
       email: String,
-      adminId: UUID
+      adminId: UUID,
+      description: String,
+      instagram: String,
+      username: String,
   ) extends Product
       with Serializable {
 
@@ -40,7 +45,10 @@ object Artists {
       name,
       phone,
       email,
-      adminId
+      adminId,
+      description,
+      instagram,
+      username
     )
   }
 }
