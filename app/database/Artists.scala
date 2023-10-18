@@ -33,7 +33,7 @@ object Artists {
       name: String,
       phone: String,
       email: String,
-      adminId: UUID,
+      admin_id: UUID,
       description: String,
       instagram: String,
       username: String,
@@ -45,7 +45,7 @@ object Artists {
       name,
       phone,
       email,
-      adminId,
+      admin_id,
       description,
       instagram,
       username

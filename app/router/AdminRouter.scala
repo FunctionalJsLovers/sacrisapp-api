@@ -1,11 +1,11 @@
 package router
 
-import controllers.{AdminController, ArtistController, CategoryController}
-import controllers.{AdminController, AppointmentController, ArtistController, CategoryController, ClientController, SessionController}
+import controllers._
 import play.api.routing.Router.Routes
 import play.api.routing.SimpleRouter
 import play.api.routing.sird._
 
+import java.util.UUID
 import javax.inject.Inject
 
 class AdminRouter @Inject() (
@@ -73,6 +73,8 @@ class AdminRouter @Inject() (
       appointmentController.createAppointment()
     case GET(p"/appointments/$id") =>
       appointmentController.listAppointment(id)
+    case GET(p"/appointments/${uuid(id)}/sessions") =>
+      appointmentController.listSessionsByAppointment(id)
   }
 
   private val sessionRoutes: Routes = {
@@ -81,4 +83,6 @@ class AdminRouter @Inject() (
     case GET(p"/sessions") =>
       sessionController.indexAll()
   }
+  val uuid = new PathBindableExtractor[UUID]
+
 }

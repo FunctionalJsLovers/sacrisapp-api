@@ -1,7 +1,6 @@
 package services
 
 import com.google.inject.Singleton
-import database.Sessions
 import database.Sessions.{SessionsTable, SessionsTableDef}
 import models.SessionTattoo
 
@@ -12,6 +11,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class SessionService @Inject() (dbService: DBService)(implicit ec: ExecutionContext) {
+
   import dbService._
   import dbService.api._
 
@@ -51,7 +51,7 @@ class SessionService @Inject() (dbService: DBService)(implicit ec: ExecutionCont
     Parameter((_: SessionsTableDef).estimated_time, session.estimated_time),
     Parameter((_: SessionsTableDef).status, session.status),
     Parameter((_: SessionsTableDef).price, session.price),
-    Parameter((_: SessionsTableDef).appointmentId, UUID.fromString(session.appointmentId))
+    Parameter((_: SessionsTableDef).appointmentId, UUID.fromString(session.appointment_id))
   )
 
 }

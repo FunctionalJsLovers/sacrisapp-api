@@ -1,23 +1,19 @@
 package utils
 
 import com.github.tminglei.slickpg._
-import org.locationtech.jts.geom.Geometry
 import play.api.libs.json._
-import slick.ast.Library._
 import slick.ast._
 import slick.basic.Capability
 import slick.jdbc._
-import slick.lifted.FunctionSymbolExtensionMethods._
 import slick.lifted.Shape
 import slick.relational.{CompiledMapping, ResultConverter}
-import slick.sql.{FixedSqlAction, SqlAction, SqlStreamingAction}
+import slick.sql.{FixedSqlAction, SqlStreamingAction}
 import slick.util.SQLBuilder
 
 import java.sql.JDBCType
-import java.time.{Instant, LocalDateTime}
+import java.time.LocalDateTime
 import java.util.UUID
 import scala.collection.immutable.Seq
-import scala.concurrent.ExecutionContext
 import scala.reflect.ClassTag
 import scala.util.chaining._
 
@@ -42,18 +38,6 @@ trait PostgresProfile extends ExPostgresProfile with PgDate2Support with PgPlayJ
       with PostGISImplicits
       with PostGISAssistants {
 
-    val DefaultSRID = 4269
-
-    val datePart: (Rep[String], Rep[LocalDateTime]) => Rep[Int] = SimpleFunction.binary[String, LocalDateTime, Int]("date_part")
-
-    implicit class EnhancedGeometryColumn(geometry: Rep[Option[Geometry]]) {
-      def union: Rep[Option[Geometry]] = SimpleFunction[Option[Geometry]]("ST_Union").apply(Seq(geometry))
-
-      def makeValid: Rep[Option[Geometry]] = SimpleFunction[Option[Geometry]]("ST_MakeValid").apply(Seq(geometry))
-
-      def union(g2: Rep[Option[Geometry]]): Rep[Option[Geometry]] = SimpleFunction[Option[Geometry]]("ST_Union").apply(Seq(geometry, g2))
-    }
-
     implicit val simpleStrSeqTypeMapper: SimpleArrayJdbcType[String] = new SimpleArrayJdbcType[String]("text")
     implicit val localDateTimeWitness: ElemWitness[LocalDateTime] = ElemWitness.AnyWitness.asInstanceOf[ElemWitness[LocalDateTime]]
     implicit val simpleLocalDateTimeSeqTypeMapper: DriverJdbcType[List[LocalDateTime]] =
@@ -65,19 +49,6 @@ trait PostgresProfile extends ExPostgresProfile with PgDate2Support with PgPlayJ
 
     // aggregation functions in slick-pg don't appear to be compatible with groupBy
     // https://github.com/tminglei/slick-pg/issues/289
-    val ArrayAgg = new SqlAggregateFunction("array_agg")
-    val BoolAnd = new SqlAggregateFunction("bool_and")
-    val BoolOr = new SqlAggregateFunction("bool_or")
-
-    implicit class ArrayAggColumnQueryExtensionMethods[P, C[_]](val q: Query[Rep[P], _, C]) {
-      def arrayAgg[B](implicit tm: TypedType[List[B]]): Rep[List[B]] = ArrayAgg.column[List[B]](q.toNode)
-
-      def boolAnd(implicit tm: TypedType[Option[Boolean]]): Rep[Option[Boolean]] = BoolAnd.column[Option[Boolean]](q.toNode)
-
-      def boolOr(implicit tm: TypedType[Option[Boolean]]): Rep[Option[Boolean]] = BoolOr.column[Option[Boolean]](q.toNode)
-    }
-
-    val nowInstant = SimpleLiteral[Instant]("now()")
 
     implicit val getResultUUID: GetResult[UUID] = GetResult[UUID](pr => UUID.fromString(pr.nextString()))
 
@@ -106,11 +77,6 @@ trait PostgresProfile extends ExPostgresProfile with PgDate2Support with PgPlayJ
 
     implicit def jsArrayTypeMapper[T <: Product](implicit format: Format[T]): BaseColumnType[Seq[T]] =
       MappedColumnType.base[Seq[T], JsValue](values => JsArray(values.map(value => Json.toJson(value)(format))), _.as[Seq[T]])
-
-    implicit class EnhancedIntSqlAction[-E <: Effect](action: SqlAction[Int, NoStream, E]) {
-      def atLeastOneIsSome(implicit ec: ExecutionContext): DBIOAction[Option[Unit], NoStream, E] =
-        action.map(x => if (x > 0) Some(()) else None)
-    }
 
     // https://www.missingfaktor.me/writing/2018/08/12/composable-table-updates-in-slick/
     sealed trait Parameter[RecordA] {
