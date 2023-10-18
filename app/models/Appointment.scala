@@ -5,8 +5,8 @@ import java.util.UUID
 case class Appointment(
     id: UUID,
     description: String,
-    artistId: UUID,
-    clientId: UUID,
+    artist_id: UUID,
+    client_id: UUID,
     category_id: UUID
 ) {}
 
