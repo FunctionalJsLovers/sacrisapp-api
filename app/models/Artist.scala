@@ -9,7 +9,7 @@ case class Artist(
     email: String,
     admin_id: UUID,
     description: String,
-    instragram: String,
+    instagram: String,
     username: String
 ) {}
 
@@ -24,7 +24,7 @@ object Artist {
       email: String,
       admin_id: String,
       description: String,
-      instragram: String,
+      instagram: String,
       username: String
   ) {}
   implicit val createArtistReads: Reads[Create] = Json.reads[Create]

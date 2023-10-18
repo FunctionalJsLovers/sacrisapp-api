@@ -2,7 +2,7 @@ package models
 
 import play.api.libs.json.OFormat
 
-import java.time.{LocalDate, LocalDateTime}
+import java.time.LocalDateTime
 import java.util.UUID
 
 case class SessionTattoo(
@@ -11,7 +11,7 @@ case class SessionTattoo(
     estimated_time: Int,
     status: String,
     price: Int,
-    appointmentId: UUID
+    appointment_id: UUID
 ) {}
 
 object SessionTattoo {
@@ -22,7 +22,7 @@ object SessionTattoo {
       estimated_time: Int,
       status: String,
       price: Int,
-      appointmentId: String
+      appointment_id: String
   )
   implicit val createSessionReads: OFormat[SessionTattoo.Create] = Json.format[Create]
   implicit val sessionFormat: OFormat[SessionTattoo] = Json.format[SessionTattoo]

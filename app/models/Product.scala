@@ -6,7 +6,7 @@ case class Product(
     id: UUID,
     name: String,
     price: Int,
-    artistId: UUID,
+    artist_id: UUID,
 ) {}
 
 object Product {

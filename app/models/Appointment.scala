@@ -7,7 +7,7 @@ case class Appointment(
     description: String,
     artistId: UUID,
     clientId: UUID,
-    categoryId: UUID
+    category_id: UUID
 ) {}
 
 object Appointment {

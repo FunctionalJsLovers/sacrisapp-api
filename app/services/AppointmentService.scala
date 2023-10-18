@@ -1,7 +1,9 @@
 package services
 
 import database.Appointments.{AppointmentsTable, AppointmentsTableDef}
-import models.Appointment
+import database.Sessions
+import database.Sessions.SessionsTable
+import models.{Appointment, SessionTattoo}
 
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
@@ -36,6 +38,14 @@ class AppointmentService @Inject() (dBService: DBService)(implicit ec: Execution
   def verifyArtistAndClient(artistId: UUID, clientId: UUID): Future[Boolean] = {
     val verifyArtistAndClient = Future.successful(artistId != clientId)
     verifyArtistAndClient
+  }
+
+  def sessionsByAppointment(appointmentId: UUID): Future[Seq[SessionTattoo]] = {
+    SessionsTable
+      .filter(_.appointmentId === appointmentId)
+      .result
+      .execute()
+      .map(_.map(_.toSession))
   }
 
   private def createAppointmentParameters(create: Appointment.Create): Seq[Parameter[AppointmentsTableDef]] = Seq(
