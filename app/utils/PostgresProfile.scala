@@ -7,13 +7,14 @@ import slick.basic.Capability
 import slick.jdbc._
 import slick.lifted.Shape
 import slick.relational.{CompiledMapping, ResultConverter}
-import slick.sql.{FixedSqlAction, SqlStreamingAction}
+import slick.sql.{FixedSqlAction, SqlAction, SqlStreamingAction}
 import slick.util.SQLBuilder
 
 import java.sql.JDBCType
 import java.time.LocalDateTime
 import java.util.UUID
 import scala.collection.immutable.Seq
+import scala.concurrent.ExecutionContext
 import scala.reflect.ClassTag
 import scala.util.chaining._
 
@@ -144,6 +145,10 @@ trait PostgresProfile extends ExPostgresProfile with PgDate2Support with PgPlayJ
         parameters.reduceLeft(_ and _).update(underlying)
     }
 
+    implicit class EnhancedIntSqlAction[-E <: Effect](action: SqlAction[Int, NoStream, E]) {
+      def atLeastOneIsSome(implicit ec: ExecutionContext): DBIOAction[Option[Unit], NoStream, E] =
+        action.map(x => if (x > 0) Some(()) else None)
+    }
     implicit class UpdateReturningInvoker[E, U, C[_]](updateQuery: Query[E, U, C]) {
       // scalastyle:off cyclomatic.complexity
       def updateReturning[A, F](returningQuery: Query[A, F, C], v: U): SqlStreamingAction[Vector[F], F, Effect] = {

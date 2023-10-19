@@ -15,9 +15,9 @@ class SessionService @Inject() (dbService: DBService)(implicit ec: ExecutionCont
   import dbService._
   import dbService.api._
 
-  def listSession(date: LocalDateTime): Future[Seq[SessionTattoo]] = {
+  def listSession(id: UUID): Future[Seq[SessionTattoo]] = {
     SessionsTable
-      .filter(_.date === date)
+      .filter(_.id === id)
       .result
       .execute()
       .map(_.map(_.toSession))
@@ -30,11 +30,18 @@ class SessionService @Inject() (dbService: DBService)(implicit ec: ExecutionCont
   }
 
   def createSession(session: SessionTattoo.Create): Future[SessionTattoo] = {
-
     val dbActions = for {
       sessionCreated <- SessionsTable.insertWithParameters(createSessionParameters(session))
     } yield sessionCreated.toSession
     dbActions.transactionally.execute()
+  }
+
+  def deleteSession(id: UUID): Future[Option[Unit]] = {
+    SessionsTable
+      .filter(_.id === id)
+      .delete
+      .atLeastOneIsSome
+      .execute()
   }
   def validateDateIncoming(date: LocalDateTime): Future[Boolean] = {
     val validateDateIncoming = Future.successful(date.isAfter(LocalDateTime.now()))
@@ -46,6 +53,16 @@ class SessionService @Inject() (dbService: DBService)(implicit ec: ExecutionCont
     val validateDateBetweenWorkableHours = Future.successful(dateHour >= 9 && dateHour <= 23)
     validateDateBetweenWorkableHours
   }
+
+  def update(id: UUID, session: SessionTattoo.Update): Future[Option[SessionTattoo]] = {
+    SessionsTable
+      .filter(_.id === id)
+      .updateReturningWithParameters(SessionsTable, updateParameters(session))
+      .headOption
+      .execute()
+      .map(_.map(_.toSession))
+  }
+
   private def createSessionParameters(session: SessionTattoo.Create): Seq[Parameter[SessionsTableDef]] = Seq(
     Parameter((_: SessionsTableDef).date, session.date),
     Parameter((_: SessionsTableDef).estimated_time, session.estimated_time),
@@ -53,5 +70,12 @@ class SessionService @Inject() (dbService: DBService)(implicit ec: ExecutionCont
     Parameter((_: SessionsTableDef).price, session.price),
     Parameter((_: SessionsTableDef).appointmentId, UUID.fromString(session.appointment_id))
   )
+
+  private def updateParameters(sessionTattoo: SessionTattoo.Update): Seq[Parameter[SessionsTableDef]] = Seq(
+    sessionTattoo.date.map(Parameter((_: SessionsTableDef).date, _)),
+    sessionTattoo.estimated_time.map(Parameter((_: SessionsTableDef).estimated_time, _)),
+    sessionTattoo.status.map(Parameter((_: SessionsTableDef).status, _)),
+    sessionTattoo.price.map(Parameter((_: SessionsTableDef).price, _))
+  ).flatten
 
 }

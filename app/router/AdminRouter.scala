@@ -82,6 +82,12 @@ class AdminRouter @Inject() (
       sessionController.createSession()
     case GET(p"/sessions") =>
       sessionController.indexAll()
+    case GET(p"/sessions/${uuid(id)}") =>
+      sessionController.listSession(id)
+    case PATCH(p"/sessions/${uuid(id)}") =>
+      sessionController.updateSession(id)
+    case DELETE(p"/sessions/${uuid(id)}") =>
+      sessionController.deleteSession(id)
   }
   val uuid = new PathBindableExtractor[UUID]
 

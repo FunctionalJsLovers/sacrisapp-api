@@ -32,12 +32,8 @@ class DBService @Inject() (protected val dbConfigProvider: DatabaseConfigProvide
 
   }
 
-  implicit class EnhancedStreamingDBIOAction[R](action: DBIOAction[Seq[R], Streaming[R], Effect.Read with Effect.Transactional]) {
-    def stream(): DatabasePublisher[R] = db stream action
-  }
 }
 
 object DBService {
-
   val DefaultQueryTimeoutSecondsConfigKey = "slick.dbs.default.queryTimeoutSeconds"
 }
