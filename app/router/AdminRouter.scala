@@ -44,6 +44,10 @@ class AdminRouter @Inject() (
       artistController.addArtist()
     case GET(p"/artists/${uuid(id)}") =>
       artistController.listArtist(id)
+    case PATCH(p"/artists/${uuid(id)}") =>
+        artistController.updateArtist(id)
+    case DELETE(p"/artists/${uuid(id)}") =>
+        artistController.deleteArtist(id)
   }
 
   private val categoriesRoutes: Routes = {

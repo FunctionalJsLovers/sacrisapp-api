@@ -37,4 +37,8 @@ object ModelJson {
   val STATUS: Reads[Option[String]] = (__ \ "status").readNullable[String](statusReads)
   val PRICE: Reads[Option[Int]] = (__ \ "price").readNullable[Int]
   val DESCRIPTION: Reads[Option[String]] = (__ \ "description").readNullable[String](text255.nonEmpty)
+  val INSTAGRAM: Reads[Option[String]] = (__ \ "instagram").readNullable[String](text255.nonEmpty)
+  val USERNAME: Reads[Option[String]] = (__ \ "username").readNullable[String](text255.nonEmpty)
+  val PHONE: Reads[Option[String]] = (__ \ "phone").readNullable[String](text255.nonEmpty)
+  val EMAIL: Reads[Option[String]] = (__ \ "email").readNullable[String](text255.nonEmpty)
 }
