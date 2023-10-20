@@ -12,9 +12,9 @@ class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionConte
   import dbService._
   import dbService.api._
 
-  def listArtist(name: String): Future[Seq[Artist]] = {
+  def listArtist(artistId: UUID): Future[Seq[Artist]] = {
     ArtistsTable
-      .filter(_.name === name)
+      .filter(_.id === artistId)
       .result
       .execute()
       .map(_.map(_.toArtist))
@@ -35,9 +35,12 @@ class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionConte
 
   private def createArtistParameters(artist: Artist.Create): Seq[Parameter[ArtistsTableDef]] = Seq(
     Parameter((_: ArtistsTableDef).name, artist.name),
-    Parameter((_: ArtistsTableDef).email, artist.email),
     Parameter((_: ArtistsTableDef).phone, artist.phone),
-    Parameter((_: ArtistsTableDef).adminId, UUID.fromString(artist.admin_id))
+    Parameter((_: ArtistsTableDef).email, artist.email),
+    Parameter((_: ArtistsTableDef).admin_id, artist.admin_id),
+    Parameter((_: ArtistsTableDef).description, artist.description),
+    Parameter((_: ArtistsTableDef).instagram, artist.instagram),
+    Parameter((_: ArtistsTableDef).username, artist.username)
   )
 
 }
