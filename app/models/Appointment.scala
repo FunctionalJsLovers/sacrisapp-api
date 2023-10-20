@@ -1,5 +1,7 @@
 package models
 
+import utils.ModelJson._
+
 import java.util.UUID
 
 case class Appointment(
@@ -21,4 +23,13 @@ object Appointment {
   )
   implicit val appointmentWrites: OWrites[Appointment] = Json.writes[Appointment]
   implicit val createAppointmentReads: Reads[Appointment.Create] = Json.reads[Create]
+
+  case class Update(
+      description: Option[String] = None
+  )
+
+    implicit val updateAppointmentReads: Reads[Update] = (
+        DESCRIPTION
+    )(Appointment.Update.apply _).withAtLeastOneAttribute
+
 }

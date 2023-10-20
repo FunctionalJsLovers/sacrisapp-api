@@ -75,6 +75,10 @@ class AdminRouter @Inject() (
       appointmentController.listAppointment(id)
     case GET(p"/appointments/${uuid(id)}/sessions") =>
       appointmentController.listSessionsByAppointment(id)
+    case PATCH(p"/appointments/${uuid(id)}") =>
+        appointmentController.updateAppointment(id)
+    case DELETE(p"/appointments/${uuid(id)}") =>
+        appointmentController.deleteAppointment(id)
   }
 
   private val sessionRoutes: Routes = {

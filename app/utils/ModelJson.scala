@@ -36,4 +36,5 @@ object ModelJson {
   val ESTIMATED_TIME: Reads[Option[Int]] = (__ \ "estimated_time").readNullable[Int]
   val STATUS: Reads[Option[String]] = (__ \ "status").readNullable[String](statusReads)
   val PRICE: Reads[Option[Int]] = (__ \ "price").readNullable[Int]
+  val DESCRIPTION: Reads[Option[String]] = (__ \ "description").readNullable[String](text255.nonEmpty)
 }

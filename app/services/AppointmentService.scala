@@ -1,7 +1,6 @@
 package services
 
 import database.Appointments.{AppointmentsTable, AppointmentsTableDef}
-import database.Sessions
 import database.Sessions.SessionsTable
 import models.{Appointment, SessionTattoo}
 
@@ -35,6 +34,23 @@ class AppointmentService @Inject() (dBService: DBService)(implicit ec: Execution
     dbActions.transactionally.execute()
   }
 
+  def deleteAppointment(id: UUID): Future[Option[Unit]] = {
+    AppointmentsTable
+      .filter(_.id === id)
+      .delete
+      .atLeastOneIsSome
+      .execute()
+  }
+
+  def update(id: UUID, appointment: Appointment.Update): Future[Option[Appointment]] = {
+    AppointmentsTable
+      .filter(_.id === id)
+      .updateReturningWithParameters(AppointmentsTable, updateParameters(appointment))
+      .headOption
+      .execute()
+      .map(_.map(_.toAppointment))
+  }
+
   def verifyArtistAndClient(artistId: UUID, clientId: UUID): Future[Boolean] = {
     val verifyArtistAndClient = Future.successful(artistId != clientId)
     verifyArtistAndClient
@@ -54,5 +70,9 @@ class AppointmentService @Inject() (dBService: DBService)(implicit ec: Execution
     Parameter((_: AppointmentsTableDef).clientId, UUID.fromString(create.client_id)),
     Parameter((_: AppointmentsTableDef).categoryId, UUID.fromString(create.category_id))
   )
+
+    private def updateParameters(appointment: Appointment.Update): Seq[Parameter[AppointmentsTableDef]] = Seq(
+    appointment.description.map(Parameter((_: AppointmentsTableDef).description, _)),
+    ).flatten
 
 }
