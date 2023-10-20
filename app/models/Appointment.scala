@@ -1,5 +1,8 @@
 package models
 
+import play.api.libs.json.{Json, OFormat, Reads}
+import utils.ModelJson._
+
 import java.util.UUID
 
 case class Appointment(
@@ -11,7 +14,6 @@ case class Appointment(
 ) {}
 
 object Appointment {
-  import play.api.libs.json._
 
   case class Create(
       description: String,
@@ -19,6 +21,13 @@ object Appointment {
       client_id: String,
       category_id: String
   )
-  implicit val appointmentWrites: OWrites[Appointment] = Json.writes[Appointment]
-  implicit val createAppointmentReads: Reads[Appointment.Create] = Json.reads[Create]
+  implicit val createAppointmentReads: OFormat[Appointment.Create] = Json.format[Create]
+  implicit val appointmentFormat: OFormat[Appointment] = Json.format[Appointment]
+  case class Update(
+      description: Option[String] = None
+  )
+
+  implicit val updateAppointmentReads: Reads[Appointment.Update] =
+    DESCRIPTION.map(description => Update(description))
+
 }
