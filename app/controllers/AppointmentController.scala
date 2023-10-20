@@ -2,7 +2,7 @@ package controllers
 
 import com.google.inject.Inject
 import models.{Appointment, SessionTattoo}
-import play.api.libs.json.{Json, OWrites, __}
+import play.api.libs.json.{__, Json, OWrites}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.AppointmentService
 import util.{ControllerJson, EitherF}

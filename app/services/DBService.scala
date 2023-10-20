@@ -4,8 +4,7 @@ import org.postgresql.util.PSQLException
 import play.api.Configuration
 import play.api.db.slick.{DatabaseConfigProvider, HasDatabaseConfigProvider}
 import services.DBService.DefaultQueryTimeoutSecondsConfigKey
-import slick.basic.DatabasePublisher
-import slick.dbio.{DBIOAction, Effect, NoStream, Streaming}
+import slick.dbio.{DBIOAction, Effect, NoStream}
 import utils.PostgresProfile
 
 import java.sql.SQLTimeoutException
