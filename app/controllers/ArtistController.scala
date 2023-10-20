@@ -6,6 +6,7 @@ import play.api.libs.json.{Json, OWrites}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.ArtistService
 import util.{ControllerJson, EitherF}
+import utils.ControllerUtil
 
 import java.util.UUID
 import scala.concurrent.ExecutionContext
@@ -13,7 +14,8 @@ import scala.concurrent.ExecutionContext
 @Singleton
 class ArtistController @Inject() (val controllerComponents: ControllerComponents, artistService: ArtistService)(implicit ec: ExecutionContext)
     extends BaseController
-    with ControllerJson {
+    with ControllerJson
+    with ControllerUtil {
   def indexAll: Action[AnyContent] = Action.async { implicit request =>
     EitherF.response(
       for {
@@ -36,6 +38,19 @@ class ArtistController @Inject() (val controllerComponents: ControllerComponents
         artists <- EitherF.right(artistService.listArtist(id))
       } yield Ok(ArtistResponse(artists))
     )
+  }
+
+  def updateArtist(id: UUID): Action[Artist.Update] = Action.async(jsonParser[Artist.Update]("artist")) { implicit request =>
+    EitherF.response(
+      for {
+        artistOpt <- EitherF.right(artistService.update(id, request.body))
+        artist <- EitherF.getOrElse(artistOpt, NotFound)
+      } yield Ok(Json.obj("artist" -> artist))
+    )
+  }
+
+  def deleteArtist(id: UUID): Action[AnyContent] = Action.async { implicit request =>
+    artistService.deleteArtist(id).map(optionNoContent)
   }
 
   private case class ArtistResponse(artists: Seq[Artist])

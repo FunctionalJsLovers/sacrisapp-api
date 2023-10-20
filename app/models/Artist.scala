@@ -1,6 +1,8 @@
 package models
 
 import java.util.UUID
+import play.api.libs.functional.syntax.toFunctionalBuilderOps
+import utils.ModelJson._
 
 case class Artist(
     id: UUID,
@@ -28,5 +30,23 @@ object Artist {
       username: String
   ) {}
   implicit val createArtistReads: Reads[Create] = Json.reads[Create]
+
+  case class Update(
+      name: Option[String] = None,
+      phone: Option[String] = None,
+      email: Option[String] = None,
+      description: Option[String] = None,
+      instagram: Option[String] = None,
+      username: Option[String] = None
+  )
+
+  implicit val updateArtistReads: Reads[Update] = (
+    NAME and
+      PHONE and
+      EMAIL and
+      DESCRIPTION and
+      INSTAGRAM and
+      USERNAME
+  )(Artist.Update.apply _).withAtLeastOneAttribute
 
 }
