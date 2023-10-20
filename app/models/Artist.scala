@@ -22,7 +22,7 @@ object Artist {
       name: String,
       phone: String,
       email: String,
-      admin_id: String,
+      admin_id: UUID,
       description: String,
       instagram: String,
       username: String

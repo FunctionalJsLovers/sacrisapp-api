@@ -42,8 +42,8 @@ class AdminRouter @Inject() (
       artistController.indexAll()
     case POST(p"/artists") =>
       artistController.addArtist()
-    case GET(p"/artists/$name") =>
-      artistController.listArtist(name)
+    case GET(p"/artists/${uuid(id)}") =>
+      artistController.listArtist(id)
   }
 
   private val categoriesRoutes: Routes = {
@@ -62,8 +62,8 @@ class AdminRouter @Inject() (
       clientController.indexAll()
     case POST(p"/clients") =>
       clientController.addClient()
-    case GET(p"/clients/$name") =>
-      clientController.listClient(name)
+    case GET(p"/clients/${uuid(id)}") =>
+      clientController.listClient(id)
   }
 
   private val appointmentsRoutes: Routes = {
@@ -76,9 +76,9 @@ class AdminRouter @Inject() (
     case GET(p"/appointments/${uuid(id)}/sessions") =>
       appointmentController.listSessionsByAppointment(id)
     case PATCH(p"/appointments/${uuid(id)}") =>
-        appointmentController.updateAppointment(id)
+      appointmentController.updateAppointment(id)
     case DELETE(p"/appointments/${uuid(id)}") =>
-        appointmentController.deleteAppointment(id)
+      appointmentController.deleteAppointment(id)
   }
 
   private val sessionRoutes: Routes = {

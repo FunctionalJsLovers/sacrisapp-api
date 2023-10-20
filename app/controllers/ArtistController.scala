@@ -7,6 +7,7 @@ import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.ArtistService
 import util.{ControllerJson, EitherF}
 
+import java.util.UUID
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -29,10 +30,10 @@ class ArtistController @Inject() (val controllerComponents: ControllerComponents
     )
   }
 
-  def listArtist(name: String): Action[AnyContent] = Action.async { implicit request =>
+  def listArtist(id: UUID): Action[AnyContent] = Action.async { implicit request =>
     EitherF.response(
       for {
-        artists <- EitherF.right(artistService.listArtist(name))
+        artists <- EitherF.right(artistService.listArtist(id))
       } yield Ok(ArtistResponse(artists))
     )
   }

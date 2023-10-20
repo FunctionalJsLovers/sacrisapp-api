@@ -7,8 +7,8 @@ import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.ClientService
 import util.{ControllerJson, EitherF}
 
+import java.util.UUID
 import javax.inject._
-
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -25,10 +25,10 @@ class ClientController @Inject() (val controllerComponents: ControllerComponents
     )
   }
 
-  def listClient(name: String): Action[AnyContent] = Action.async { implicit request =>
+  def listClient(id: UUID): Action[AnyContent] = Action.async { implicit request =>
     EitherF.response(
       for {
-        clients <- EitherF.right(clientService.listClient(name))
+        clients <- EitherF.right(clientService.listClient(id))
       } yield Ok(ClientResponse(clients))
     )
   }
