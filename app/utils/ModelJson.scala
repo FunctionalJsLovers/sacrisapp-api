@@ -11,8 +11,8 @@ object ModelJson {
     .filterNot(JsonValidationError("cannot be longer than 255"))(_.length > 255)
 
   val statusReads: Reads[String] = {
-    case JsString(status) if Seq("scheduled", "paid").contains(status) => JsSuccess(status)
-    case _ => JsError("must be either \"scheduled\" or \"paid\"")
+    case JsString(status) if Seq("scheduled", "totally_paid", "prepaid", "unpaid").contains(status) => JsSuccess(status)
+    case _ => JsError("must be either \"scheduled\" or \"totally_paid\" or \"prepaid\" or \"unpaid\"")
   }
 
   implicit class EnhancedReads[T <: Product](reads: Reads[T]) {
