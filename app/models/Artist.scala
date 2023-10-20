@@ -32,22 +32,21 @@ object Artist {
   implicit val createArtistReads: Reads[Create] = Json.reads[Create]
 
   case class Update(
-        name: Option[String] = None,
-        phone: Option[String] = None,
-        email: Option[String] = None,
-        description: Option[String] = None,
-        instagram: Option[String] = None,
-        username: Option[String] = None
-                   )
+      name: Option[String] = None,
+      phone: Option[String] = None,
+      email: Option[String] = None,
+      description: Option[String] = None,
+      instagram: Option[String] = None,
+      username: Option[String] = None
+  )
 
   implicit val updateArtistReads: Reads[Update] = (
-  NAME and
-    PHONE and
-    EMAIL and
-    DESCRIPTION and
-    INSTAGRAM and
-    USERNAME
+    NAME and
+      PHONE and
+      EMAIL and
+      DESCRIPTION and
+      INSTAGRAM and
+      USERNAME
   )(Artist.Update.apply _).withAtLeastOneAttribute
-
 
 }
