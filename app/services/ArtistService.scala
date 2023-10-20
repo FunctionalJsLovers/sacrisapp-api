@@ -12,9 +12,9 @@ class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionConte
   import dbService._
   import dbService.api._
 
-  def listArtist(name: String): Future[Seq[Artist]] = {
+  def listArtist(artistId: UUID): Future[Seq[Artist]] = {
     ArtistsTable
-      .filter(_.name === name)
+      .filter(_.id === artistId)
       .result
       .execute()
       .map(_.map(_.toArtist))

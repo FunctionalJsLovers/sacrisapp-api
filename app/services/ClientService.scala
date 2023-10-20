@@ -4,6 +4,7 @@ import com.google.inject.Inject
 import database.Clients.{ClientsTable, ClientsTableDef}
 import models.Client
 
+import java.util.UUID
 import javax.inject.Singleton
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -12,9 +13,9 @@ class ClientService @Inject() (dBService: DBService)(implicit ec: ExecutionConte
   import dBService._
   import dBService.api._
 
-  def listClient(name: String): Future[Seq[Client]] = {
+  def listClient(clientId: UUID): Future[Seq[Client]] = {
     ClientsTable
-      .filter(_.name === name)
+      .filter(_.id === clientId)
       .result
       .execute()
       .map(_.map(_.toClient))
