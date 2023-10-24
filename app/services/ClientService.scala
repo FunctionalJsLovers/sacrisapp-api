@@ -34,6 +34,29 @@ class ClientService @Inject() (dBService: DBService)(implicit ec: ExecutionConte
     dbActions.transactionally.execute()
   }
 
+  def deleteClient(id:UUID): Future[Option[Unit]] = {
+    ClientsTable
+      .filter(_.id === id)
+      .delete
+      .atLeastOneIsSome
+      .execute()
+  }
+
+  def update(id: UUID, client: Client.Update): Future[Option[Client]] = {
+      ClientsTable
+      .filter(_.id === id)
+      .updateReturningWithParameters(ClientsTable, updateParameters(client))
+      .headOption
+      .execute()
+      .map(_.map(_.toClient))
+  }
+
+  private def updateParameters(client: Client.Update): Seq[Parameter[ClientsTableDef]] = Seq(
+      client.name.map(Parameter((_: ClientsTableDef).name, _)),
+      client.phone.map(Parameter((_: ClientsTableDef).phone, _)),
+      client.email.map(Parameter((_: ClientsTableDef).email, _)),
+  )
+
   private def createClientParameters(client: Client.Create): Seq[Parameter[ClientsTableDef]] = Seq(
     Parameter((_: ClientsTableDef).name, client.name),
     Parameter((_: ClientsTableDef).phone, client.phone),
