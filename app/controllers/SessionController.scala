@@ -2,7 +2,7 @@ package controllers
 
 import models.SessionTattoo
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
-import play.api.libs.json.{Json, OWrites, __}
+import play.api.libs.json.{__, Json, OWrites}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.SessionService
 import util.{ControllerJson, EitherF}
@@ -32,11 +32,11 @@ class SessionController @Inject() (val controllerComponents: ControllerComponent
     EitherF.response(
       for {
         _ <- EitherF.require(validateDateIncoming, BadRequest(JsonErrors(__ \ "date", "Date must be after now")))
-        _ <- EitherF.require(validateHourWorkable, BadRequest(JsonErrors(__ \ "date", "Date must be between workable hours")))
         session <- EitherF.right(sessionService.createSession(request.body))
       } yield Ok(Json.obj("session" -> session))
     )
   }
+
   def updateSession(id: UUID): Action[SessionTattoo.Update] = Action.async(jsonParser[SessionTattoo.Update]("session")) { implicit request =>
     EitherF.response(
       for {

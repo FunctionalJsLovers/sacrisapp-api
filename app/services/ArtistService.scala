@@ -12,10 +12,11 @@ class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionConte
   import dbService._
   import dbService.api._
 
-  def listArtist(artistId: UUID): Future[Seq[Artist]] = {
+  def listArtist(artistId: UUID): Future[Option[Artist]] = {
     ArtistsTable
       .filter(_.id === artistId)
       .result
+      .headOption
       .execute()
       .map(_.map(_.toArtist))
   }
@@ -33,7 +34,7 @@ class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionConte
     dbActions.transactionally.execute()
   }
 
-  def deleteArtist(id:UUID): Future[Option[Unit]] = {
+  def deleteArtist(id: UUID): Future[Option[Unit]] = {
     ArtistsTable
       .filter(_.id === id)
       .delete

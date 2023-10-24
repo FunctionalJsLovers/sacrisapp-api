@@ -63,6 +63,13 @@ class SessionService @Inject() (dbService: DBService)(implicit ec: ExecutionCont
       .map(_.map(_.toSession))
   }
 
+  def sessionsByAppointment(appointmentId: UUID): Future[Seq[SessionTattoo]] = {
+    SessionsTable
+      .filter(_.appointmentId === appointmentId)
+      .result
+      .execute()
+      .map(_.map(_.toSession))
+  }
   private def createSessionParameters(session: SessionTattoo.Create): Seq[Parameter[SessionsTableDef]] = Seq(
     Parameter((_: SessionsTableDef).date, session.date),
     Parameter((_: SessionsTableDef).estimated_time, session.estimated_time),

@@ -4,7 +4,7 @@ import com.google.inject.Inject
 import models.{Appointment, SessionTattoo}
 import play.api.libs.json.{__, Json, OWrites}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
-import services.AppointmentService
+import services.{AppointmentService, SessionService}
 import util.{ControllerJson, EitherF}
 import utils.ControllerUtil
 
@@ -13,8 +13,8 @@ import scala.concurrent.ExecutionContext
 import javax.inject.Singleton
 
 @Singleton
-class AppointmentController @Inject() (val controllerComponents: ControllerComponents, appointmentService: AppointmentService)(implicit
-    ec: ExecutionContext
+class AppointmentController @Inject() (val controllerComponents: ControllerComponents, appointmentService: AppointmentService, sessionService: SessionService)(
+    implicit ec: ExecutionContext
 ) extends BaseController
     with ControllerJson
     with ControllerUtil {
@@ -26,9 +26,9 @@ class AppointmentController @Inject() (val controllerComponents: ControllerCompo
 
   }
 
-  def listAppointment(id: String): Action[AnyContent] = Action.async { implicit request =>
+  def listAppointment(id: UUID): Action[AnyContent] = Action.async { implicit request =>
     EitherF.response(for {
-      appointments <- EitherF.right(appointmentService.listAppointment(UUID.fromString(id)))
+      appointments <- EitherF.right(appointmentService.listAppointment(id))
     } yield Ok(AppointmentResponse(appointments)))
   }
 
@@ -39,7 +39,6 @@ class AppointmentController @Inject() (val controllerComponents: ControllerCompo
       appointment <- EitherF.right(appointmentService.createAppointment(request.body))
     } yield Ok(AppointmentResponse(Seq(appointment))))
   }
-
   def updateAppointment(id: UUID): Action[Appointment.Update] = Action.async(jsonParser[Appointment.Update]("appointment")) { implicit request =>
     EitherF.response(for {
       appointmentOpt <- EitherF.right(appointmentService.update(id, request.body))
@@ -47,9 +46,9 @@ class AppointmentController @Inject() (val controllerComponents: ControllerCompo
     } yield Ok(Json.obj("appointment" -> appointment)))
   }
 
-  def listSessionsByAppointment(id: UUID): Action[AnyContent] = Action.async { implicit request =>
+  def listSessionsByAppointment(appointmentId: UUID): Action[AnyContent] = Action.async { implicit request =>
     EitherF.response(for {
-      sessions <- EitherF.right(appointmentService.sessionsByAppointment(id))
+      sessions <- EitherF.right(sessionService.sessionsByAppointment(appointmentId))
     } yield Ok(SessionsByAppointmentResponse(sessions)))
   }
 

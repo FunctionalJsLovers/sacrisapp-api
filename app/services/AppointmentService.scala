@@ -56,12 +56,14 @@ class AppointmentService @Inject() (dBService: DBService)(implicit ec: Execution
     verifyArtistAndClient
   }
 
-  def sessionsByAppointment(appointmentId: UUID): Future[Seq[SessionTattoo]] = {
-    SessionsTable
-      .filter(_.appointmentId === appointmentId)
+
+
+  def listAppointmentsByArtist(artistId: UUID): Future[Seq[Appointment]] = {
+    AppointmentsTable
+      .filter(_.artistId === artistId)
       .result
       .execute()
-      .map(_.map(_.toSession))
+      .map(_.map(_.toAppointment))
   }
 
   private def createAppointmentParameters(create: Appointment.Create): Seq[Parameter[AppointmentsTableDef]] = Seq(
@@ -71,8 +73,8 @@ class AppointmentService @Inject() (dBService: DBService)(implicit ec: Execution
     Parameter((_: AppointmentsTableDef).categoryId, UUID.fromString(create.category_id))
   )
 
-    private def updateParameters(appointment: Appointment.Update): Seq[Parameter[AppointmentsTableDef]] = Seq(
+  private def updateParameters(appointment: Appointment.Update): Seq[Parameter[AppointmentsTableDef]] = Seq(
     appointment.description.map(Parameter((_: AppointmentsTableDef).description, _)),
-    ).flatten
+  ).flatten
 
 }

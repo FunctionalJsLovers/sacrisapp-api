@@ -14,7 +14,8 @@ class AdminRouter @Inject() (
     categoryController: CategoryController,
     clientController: ClientController,
     appointmentController: AppointmentController,
-    sessionController: SessionController
+    sessionController: SessionController,
+    artistsAppointmentController: ArtistsAppointmentController
 ) extends SimpleRouter {
 
   override def routes: Routes = {
@@ -45,9 +46,11 @@ class AdminRouter @Inject() (
     case GET(p"/artists/${uuid(id)}") =>
       artistController.listArtist(id)
     case PATCH(p"/artists/${uuid(id)}") =>
-        artistController.updateArtist(id)
+      artistController.updateArtist(id)
     case DELETE(p"/artists/${uuid(id)}") =>
-        artistController.deleteArtist(id)
+      artistController.deleteArtist(id)
+    case GET(p"/artists/${uuid(id)}/sessions") =>
+      artistsAppointmentController.sessionsByArtist(id)
   }
 
   private val categoriesRoutes: Routes = {
@@ -69,9 +72,9 @@ class AdminRouter @Inject() (
     case GET(p"/clients/${uuid(id)}") =>
       clientController.listClient(id)
     case PATCH(p"/clients/${uuid(id)}") =>
-        clientController.updateClient(id)
+      clientController.updateClient(id)
     case DELETE(p"/clients/${uuid(id)}") =>
-        clientController.deleteClient(id)
+      clientController.deleteClient(id)
   }
 
   private val appointmentsRoutes: Routes = {
@@ -79,7 +82,7 @@ class AdminRouter @Inject() (
       appointmentController.indexAll()
     case POST(p"/appointments") =>
       appointmentController.createAppointment()
-    case GET(p"/appointments/$id") =>
+    case GET(p"/appointments/${uuid(id)}") =>
       appointmentController.listAppointment(id)
     case GET(p"/appointments/${uuid(id)}/sessions") =>
       appointmentController.listSessionsByAppointment(id)
@@ -100,6 +103,7 @@ class AdminRouter @Inject() (
       sessionController.updateSession(id)
     case DELETE(p"/sessions/${uuid(id)}") =>
       sessionController.deleteSession(id)
+
   }
   val uuid = new PathBindableExtractor[UUID]
 
