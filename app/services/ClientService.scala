@@ -55,7 +55,7 @@ class ClientService @Inject() (dBService: DBService)(implicit ec: ExecutionConte
       client.name.map(Parameter((_: ClientsTableDef).name, _)),
       client.phone.map(Parameter((_: ClientsTableDef).phone, _)),
       client.email.map(Parameter((_: ClientsTableDef).email, _)),
-  )
+  ).flatten
 
   private def createClientParameters(client: Client.Create): Seq[Parameter[ClientsTableDef]] = Seq(
     Parameter((_: ClientsTableDef).name, client.name),
