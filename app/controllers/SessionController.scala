@@ -4,7 +4,7 @@ import models.SessionTattoo
 import play.api.libs.json.OFormat.oFormatFromReadsAndOWrites
 import play.api.libs.json.{__, Json, OWrites}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
-import services.SessionService
+import services.{AppointmentService, ArtistAppointmentService, SessionService}
 import util.{ControllerJson, EitherF}
 import utils.ControllerUtil
 
@@ -12,7 +12,12 @@ import java.util.UUID
 import scala.concurrent.ExecutionContext
 import javax.inject.Inject
 
-class SessionController @Inject() (val controllerComponents: ControllerComponents, sessionService: SessionService)(implicit
+class SessionController @Inject() (
+    val controllerComponents: ControllerComponents,
+    sessionService: SessionService,
+    artistsAppointmentService: ArtistAppointmentService,
+    appointmentService: AppointmentService
+)(implicit
     ec: ExecutionContext
 ) extends BaseController
     with ControllerJson
@@ -27,11 +32,20 @@ class SessionController @Inject() (val controllerComponents: ControllerComponent
   }
 
   def createSession(): Action[SessionTattoo.Create] = Action.async(jsonParser[SessionTattoo.Create]("session")) { implicit request =>
-    val validateDateIncoming = sessionService.validateDateIncoming(request.body.date)
-    val validateHourWorkable = sessionService.validateDateBetweenWorkableHours(request.body.date)
+    val validateDate = sessionService.validateDateIncoming(request.body.date)
+    val validateSameSchedule = for {
+      existingAppointments <- appointmentService.listAppointment(UUID.fromString(request.body.appointment_id))
+      artistId = existingAppointments.map(_.artist_id).head
+      sessions <- artistsAppointmentService.listSessionsByArtistId(artistId)
+    } yield sessionService.validateSessions(sessions, request.body.date)
+
     EitherF.response(
       for {
-        _ <- EitherF.require(validateDateIncoming, BadRequest(JsonErrors(__ \ "date", "Date must be after now")))
+        _ <- EitherF.require(
+               validateSameSchedule,
+               BadRequest(JsonErrors(__ \ "date" \ "hour", "Hour is already taken"))
+             )
+        _ <- EitherF.require(validateDate, BadRequest(JsonErrors(__ \ "date", "Date must be after now")))
         session <- EitherF.right(sessionService.createSession(request.body))
       } yield Ok(Json.obj("session" -> session))
     )
