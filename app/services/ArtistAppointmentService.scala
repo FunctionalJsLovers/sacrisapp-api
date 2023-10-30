@@ -20,32 +20,17 @@ class ArtistAppointmentService @Inject() (
   import dbService._
   import dbService.api._
 
-  def listSessionsByArtistId(artistId: UUID): Future[Seq[Appointment]] = {
-    val appointments = AppointmentsTable
-      .filter(_.artistId === artistId)
-      .map(a => (a.id, a.description, a.artistId, a.clientId, a.categoryId))
-      .result
-
+  def listSessionsByArtistId(artistId: UUID): Future[Seq[SessionTattoo]] = {
     val actions = for {
-      appointmentOpt <- appointments
       query <- AppointmentsTable
-                 .filter(_.artistId inSet appointmentOpt.map(_._3))
+                 .filter(_.artistId === artistId)
                  .join(SessionsTable)
                  .on(_.id === _.appointmentId)
                  .map { case (appointment, session) => (appointment.id, session) }
                  .result
       appointmentSessionList = query.groupMap(_._1)(_._2)
       toSession = appointmentSessionList.values.flatten.map(_.toSession).toSeq
-    } yield appointmentOpt.map { case (i, d, ai, ci, catI) =>
-      Appointment(
-        i,
-        d,
-        ai,
-        ci,
-        catI,
-        sessions = Some(toSession)
-      )
-    }
+    } yield toSession
     actions.transactionally.execute()
   }
 

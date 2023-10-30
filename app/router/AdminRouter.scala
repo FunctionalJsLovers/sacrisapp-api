@@ -68,7 +68,7 @@ class AdminRouter @Inject() (
     case GET(p"/clients") =>
       clientController.indexAll()
     case POST(p"/clients") =>
-      clientController.addClient()
+      clientController.createClient()
     case GET(p"/clients/${uuid(id)}") =>
       clientController.listClient(id)
     case PATCH(p"/clients/${uuid(id)}") =>

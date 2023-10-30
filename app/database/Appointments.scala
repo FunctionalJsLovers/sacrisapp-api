@@ -28,7 +28,9 @@ object Appointments {
 
     def categoryId: Rep[UUID] = column[UUID]("artist_category_id")
 
-    override def * : ProvenShape[AppointmentRow] = (id, description, artistId, clientId, categoryId)
+    def identifier: Rep[String] = column[String]("identifier")
+
+    override def * : ProvenShape[AppointmentRow] = (id, description, artistId, clientId, categoryId, identifier)
       .mapTo[AppointmentRow]
 
   }
@@ -38,7 +40,8 @@ object Appointments {
       description: String,
       artistId: UUID,
       clientId: UUID,
-      categoryId: UUID
+      categoryId: UUID,
+      identifier: String
   ) extends Product
       with Serializable {
     def toAppointment: Appointment = Appointment(
@@ -46,7 +49,8 @@ object Appointments {
       description,
       artistId,
       clientId,
-      categoryId
+      categoryId,
+      identifier = identifier
     )
   }
 }

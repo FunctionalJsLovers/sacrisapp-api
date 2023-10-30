@@ -32,6 +32,6 @@ class ArtistsAppointmentController @Inject() (
     } yield Ok(SessionResponse(sessions)))
   }
 
-  private case class SessionResponse(sessions: Seq[Appointment])
+  private case class SessionResponse(sessions: Seq[SessionTattoo])
   private implicit val sessionResponseWrites: OWrites[SessionResponse] = Json.writes[SessionResponse]
 }
