@@ -2,7 +2,7 @@ package controllers
 
 import auth.AuthAction
 import models.Client
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{__, Json, OWrites}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.ClientService
 import util.{ControllerJson, EitherF}
@@ -17,7 +17,7 @@ class ClientController @Inject() (val controllerComponents: ControllerComponents
     ec: ExecutionContext
 ) extends BaseController
     with ControllerJson
-    with ControllerUtil{
+    with ControllerUtil {
 
   def indexAll: Action[AnyContent] = Action.async { implicit request =>
     EitherF.response(
@@ -30,14 +30,16 @@ class ClientController @Inject() (val controllerComponents: ControllerComponents
   def listClient(id: UUID): Action[AnyContent] = Action.async { implicit request =>
     EitherF.response(
       for {
-        clients <- EitherF.right(clientService.listClient(id))
-      } yield Ok(ClientResponse(clients))
+        clients <- EitherF.getOrElse(clientService.listClient(id), NotFound)
+      } yield Ok(Json.obj("client" -> clients))
     )
   }
 
-  def addClient(): Action[Client.Create] = Action.async(parse.json[Client.Create]) { implicit request =>
+  def createClient: Action[Client.Create] = Action.async(parse.json[Client.Create]) { implicit request =>
+    val verifyEmailIsUnique = clientService.verifyEmailIsUnique(request.body.email, None)
     EitherF.response(
       for {
+        _ <- EitherF.require(verifyEmailIsUnique, BadRequest(JsonErrors(__ \ "client" \ "email", "is already registered")))
         client <- EitherF.right(clientService.createClient(request.body))
       } yield Ok(ClientResponse(Seq(client)))
     )
@@ -55,8 +57,6 @@ class ClientController @Inject() (val controllerComponents: ControllerComponents
   def deleteClient(id: UUID): Action[AnyContent] = Action.async { implicit request =>
     clientService.deleteClient(id).map(optionNoContent)
   }
-
-
 
   private case class ClientResponse(clients: Seq[Client])
   private implicit val clientResponseWrites: OWrites[ClientResponse] = Json.writes[ClientResponse]

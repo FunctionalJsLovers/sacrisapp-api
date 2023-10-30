@@ -225,6 +225,14 @@ trait PostgresProfile extends ExPostgresProfile with PgDate2Support with PgPlayJ
         }
     }
 
+    implicit class FlatteningJoin3[T1, T2, T3, Col[_]](private val query: Query[((T1, T2), T3), _, Col]) {
+      def flatten[T, G](implicit shape: Shape[_ <: FlatShapeLevel, (T1, T2, T3), T, G]): Query[G, T, Col] = query.map(t => (t._1._1, t._1._2, t._2))
+    }
+
+    implicit class FlatteningJoin4[T1, T2, T3, T4, Col[_]](private val query: Query[((T1, T2, T3), T4), _, Col]) {
+      def flatten[T, G](implicit shape: Shape[_ <: FlatShapeLevel, (T1, T2, T3, T4), T, G]): Query[G, T, Col] = query.map(t => (t._1._1, t._1._2, t._1._3, t._2))
+    }
+
   }
 }
 

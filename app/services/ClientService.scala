@@ -10,13 +10,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ClientService @Inject() (dBService: DBService)(implicit ec: ExecutionContext) {
+
   import dBService._
   import dBService.api._
 
-  def listClient(clientId: UUID): Future[Seq[Client]] = {
+  def listClient(clientId: UUID): Future[Option[Client]] = {
     ClientsTable
       .filter(_.id === clientId)
       .result
+      .headOption
       .execute()
       .map(_.map(_.toClient))
   }
@@ -34,7 +36,7 @@ class ClientService @Inject() (dBService: DBService)(implicit ec: ExecutionConte
     dbActions.transactionally.execute()
   }
 
-  def deleteClient(id:UUID): Future[Option[Unit]] = {
+  def deleteClient(id: UUID): Future[Option[Unit]] = {
     ClientsTable
       .filter(_.id === id)
       .delete
@@ -43,7 +45,7 @@ class ClientService @Inject() (dBService: DBService)(implicit ec: ExecutionConte
   }
 
   def update(id: UUID, client: Client.Update): Future[Option[Client]] = {
-      ClientsTable
+    ClientsTable
       .filter(_.id === id)
       .updateReturningWithParameters(ClientsTable, updateParameters(client))
       .headOption
@@ -51,10 +53,15 @@ class ClientService @Inject() (dBService: DBService)(implicit ec: ExecutionConte
       .map(_.map(_.toClient))
   }
 
+  def verifyEmailIsUnique(email: String, clientId: Option[UUID]): Future[Boolean] = {
+    val query = ClientsTable.filterOpt(clientId)(_.id =!= _).filter(_.email === email).length
+    query.result.map(_ <= 0).execute()
+  }
+
   private def updateParameters(client: Client.Update): Seq[Parameter[ClientsTableDef]] = Seq(
-      client.name.map(Parameter((_: ClientsTableDef).name, _)),
-      client.phone.map(Parameter((_: ClientsTableDef).phone, _)),
-      client.email.map(Parameter((_: ClientsTableDef).email, _)),
+    client.name.map(Parameter((_: ClientsTableDef).name, _)),
+    client.phone.map(Parameter((_: ClientsTableDef).phone, _)),
+    client.email.map(Parameter((_: ClientsTableDef).email, _)),
   ).flatten
 
   private def createClientParameters(client: Client.Create): Seq[Parameter[ClientsTableDef]] = Seq(

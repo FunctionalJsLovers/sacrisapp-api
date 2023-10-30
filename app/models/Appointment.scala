@@ -10,7 +10,9 @@ case class Appointment(
     description: String,
     artist_id: UUID,
     client_id: UUID,
-    category_id: UUID
+    category_id: UUID,
+    sessions: Option[Seq[SessionTattoo]] = None,
+    identifier: String
 ) {}
 
 object Appointment {

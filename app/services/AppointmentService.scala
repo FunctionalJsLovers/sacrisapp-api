@@ -3,6 +3,9 @@ package services
 import database.Appointments.{AppointmentsTable, AppointmentsTableDef}
 import database.Sessions.SessionsTable
 import models.{Appointment, SessionTattoo}
+import play.api.mvc.Results.NotFound
+import util.EitherF
+import utils.PostgresProfile.PostgresAPI
 
 import java.util.UUID
 import javax.inject.{Inject, Singleton}
@@ -27,9 +30,9 @@ class AppointmentService @Inject() (dBService: DBService)(implicit ec: Execution
       .map(_.map(_.toAppointment))
   }
 
-  def createAppointment(appointment: Appointment.Create): Future[Appointment] = {
+  def createAppointment(appointment: Appointment.Create, identifier: String): Future[Appointment] = {
     val dbActions = for {
-      appointmentCreated <- AppointmentsTable.insertWithParameters(createAppointmentParameters(appointment))
+      appointmentCreated <- AppointmentsTable.insertWithParameters(createAppointmentParameters(appointment, identifier))
     } yield appointmentCreated.toAppointment
     dbActions.transactionally.execute()
   }
@@ -56,23 +59,24 @@ class AppointmentService @Inject() (dBService: DBService)(implicit ec: Execution
     verifyArtistAndClient
   }
 
-  def sessionsByAppointment(appointmentId: UUID): Future[Seq[SessionTattoo]] = {
-    SessionsTable
-      .filter(_.appointmentId === appointmentId)
+  def listAppointmentsByArtist(artistId: UUID): Future[Seq[Appointment]] = {
+    AppointmentsTable
+      .filter(_.artistId === artistId)
       .result
       .execute()
-      .map(_.map(_.toSession))
+      .map(_.map(_.toAppointment))
   }
 
-  private def createAppointmentParameters(create: Appointment.Create): Seq[Parameter[AppointmentsTableDef]] = Seq(
+  private def createAppointmentParameters(create: Appointment.Create, identifier: String): Seq[Parameter[AppointmentsTableDef]] = Seq(
     Parameter((_: AppointmentsTableDef).description, create.description),
     Parameter((_: AppointmentsTableDef).artistId, UUID.fromString(create.artist_id)),
     Parameter((_: AppointmentsTableDef).clientId, UUID.fromString(create.client_id)),
-    Parameter((_: AppointmentsTableDef).categoryId, UUID.fromString(create.category_id))
+    Parameter((_: AppointmentsTableDef).categoryId, UUID.fromString(create.category_id)),
+    Parameter((_: AppointmentsTableDef).identifier, identifier)
   )
 
-    private def updateParameters(appointment: Appointment.Update): Seq[Parameter[AppointmentsTableDef]] = Seq(
+  private def updateParameters(appointment: Appointment.Update): Seq[Parameter[AppointmentsTableDef]] = Seq(
     appointment.description.map(Parameter((_: AppointmentsTableDef).description, _)),
-    ).flatten
+  ).flatten
 
 }

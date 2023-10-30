@@ -9,13 +9,15 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionContext) {
+
   import dbService._
   import dbService.api._
 
-  def listArtist(artistId: UUID): Future[Seq[Artist]] = {
+  def listArtist(artistId: UUID): Future[Option[Artist]] = {
     ArtistsTable
       .filter(_.id === artistId)
       .result
+      .headOption
       .execute()
       .map(_.map(_.toArtist))
   }
@@ -33,7 +35,7 @@ class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionConte
     dbActions.transactionally.execute()
   }
 
-  def deleteArtist(id:UUID): Future[Option[Unit]] = {
+  def deleteArtist(id: UUID): Future[Option[Unit]] = {
     ArtistsTable
       .filter(_.id === id)
       .delete
@@ -49,6 +51,12 @@ class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionConte
       .execute()
       .map(_.map(_.toArtist))
   }
+
+  def verifyEmailIsUnique(email: String): Future[Boolean] = {
+    val query = ArtistsTable.filter(_.email === email).length
+    query.result.map(_ <= 0).execute()
+  }
+
 
   private def createArtistParameters(artist: Artist.Create): Seq[Parameter[ArtistsTableDef]] = Seq(
     Parameter((_: ArtistsTableDef).name, artist.name),
