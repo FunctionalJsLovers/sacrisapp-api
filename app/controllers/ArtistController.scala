@@ -2,9 +2,9 @@ package controllers
 
 import com.google.inject.{Inject, Singleton}
 import models.Artist
-import play.api.libs.json.{Json, OWrites}
+import play.api.libs.json.{__, Json, OWrites}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
-import services.{ArtistAppointmentService, ArtistService}
+import services.ArtistService
 import util.{ControllerJson, EitherF}
 import utils.ControllerUtil
 
@@ -16,7 +16,7 @@ class ArtistController @Inject() (val controllerComponents: ControllerComponents
     extends BaseController
     with ControllerJson
     with ControllerUtil {
-  def indexAll: Action[AnyContent] = Action.async { implicit request =>
+  def indexAll: Action[AnyContent] = Action.async {
     EitherF.response(
       for {
         artists <- EitherF.right(artistService.listArtists)
@@ -24,15 +24,16 @@ class ArtistController @Inject() (val controllerComponents: ControllerComponents
     )
   }
 
-  def addArtist(): Action[Artist.Create] = Action.async(parse.json[Artist.Create]) { implicit request =>
+  def createArtist(): Action[Artist.Create] = Action.async(parse.json[Artist.Create]) { implicit request =>
     EitherF.response(
       for {
+        _ <- EitherF.require(artistService.verifyEmailIsUnique(request.body.email), BadRequest(JsonErrors(__ \ "artist" \ "email", "is already registered")))
         artist <- EitherF.right(artistService.createArtist(request.body))
       } yield Ok(ArtistResponse(Seq(artist)))
     )
   }
 
-  def listArtist(id: UUID): Action[AnyContent] = Action.async { implicit request =>
+  def listArtist(id: UUID): Action[AnyContent] = Action.async {
     EitherF.response(
       for {
         artist <- EitherF.getOrElse(artistService.listArtist(id), NotFound)
@@ -49,7 +50,7 @@ class ArtistController @Inject() (val controllerComponents: ControllerComponents
     )
   }
 
-  def deleteArtist(id: UUID): Action[AnyContent] = Action.async { implicit request =>
+  def deleteArtist(id: UUID): Action[AnyContent] = Action.async {
     artistService.deleteArtist(id).map(optionNoContent)
   }
 

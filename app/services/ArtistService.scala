@@ -9,6 +9,7 @@ import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
 class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionContext) {
+
   import dbService._
   import dbService.api._
 
@@ -50,6 +51,12 @@ class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionConte
       .execute()
       .map(_.map(_.toArtist))
   }
+
+  def verifyEmailIsUnique(email: String): Future[Boolean] = {
+    val query = ArtistsTable.filter(_.email === email).length
+    query.result.map(_ <= 0).execute()
+  }
+
 
   private def createArtistParameters(artist: Artist.Create): Seq[Parameter[ArtistsTableDef]] = Seq(
     Parameter((_: ArtistsTableDef).name, artist.name),

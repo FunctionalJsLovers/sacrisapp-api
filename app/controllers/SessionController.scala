@@ -23,7 +23,7 @@ class SessionController @Inject() (
     with ControllerJson
     with ControllerUtil {
 
-  def indexAll: Action[AnyContent] = Action.async { implicit request =>
+  def indexAll: Action[AnyContent] = Action.async {
     EitherF.response(
       for {
         sessions <- EitherF.right(sessionService.listSessions)
@@ -60,7 +60,7 @@ class SessionController @Inject() (
     )
   }
 
-  def listSession(id: UUID): Action[AnyContent] = Action.async { implicit request =>
+  def listSession(id: UUID): Action[AnyContent] = Action.async {
     EitherF.response(
       for {
         session <- EitherF.right(sessionService.listSession(id))
@@ -68,7 +68,7 @@ class SessionController @Inject() (
     )
   }
 
-  def deleteSession(id: UUID): Action[AnyContent] = Action.async { implicit request =>
+  def deleteSession(id: UUID): Action[AnyContent] = Action.async {
     sessionService.deleteSession(id).map(optionNoContent)
   }
 

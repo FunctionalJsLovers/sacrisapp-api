@@ -42,7 +42,7 @@ class AdminRouter @Inject() (
     case GET(p"/artists") =>
       artistController.indexAll()
     case POST(p"/artists") =>
-      artistController.addArtist()
+      artistController.createArtist()
     case GET(p"/artists/${uuid(id)}") =>
       artistController.listArtist(id)
     case PATCH(p"/artists/${uuid(id)}") =>
