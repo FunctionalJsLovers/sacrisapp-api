@@ -49,4 +49,7 @@ object Artist {
       USERNAME
   )(Artist.Update.apply _).withAtLeastOneAttribute
 
+  case class ArtistSessionsMonth(artistSession: Map[String, Int])
+  implicit val artistResponseWrites: OWrites[ArtistSessionsMonth] = Json.writes[ArtistSessionsMonth]
+
 }
