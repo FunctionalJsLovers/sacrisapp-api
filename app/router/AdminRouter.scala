@@ -15,7 +15,8 @@ class AdminRouter @Inject() (
     clientController: ClientController,
     appointmentController: AppointmentController,
     sessionController: SessionController,
-    artistsAppointmentController: ArtistsAppointmentController
+    artistsAppointmentController: ArtistsAppointmentController,
+    reportController: ReportController
 ) extends SimpleRouter {
 
   override def routes: Routes = {
@@ -24,7 +25,8 @@ class AdminRouter @Inject() (
       categoriesRoutes orElse
       clientsRoutes orElse
       appointmentsRoutes orElse
-      sessionRoutes
+      sessionRoutes orElse
+      reportRoutes
   }
 
   private val adminRoutes: Routes = {
@@ -105,6 +107,11 @@ class AdminRouter @Inject() (
       sessionController.deleteSession(id)
 
   }
+
+  private val reportRoutes: Routes = { case GET(p"/topArtistByNumberOfSessions") =>
+    reportController.topArtistByNumberOfSessions()
+  }
+
   val uuid = new PathBindableExtractor[UUID]
 
 }
