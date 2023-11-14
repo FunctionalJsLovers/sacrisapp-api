@@ -1,6 +1,9 @@
 package controllers
 
 import com.google.inject.{Inject, Singleton}
+import models.Artist.ArtistSessionsMonth
+import models.{Artist, SessionTattoo}
+import play.api.libs.json.{Json, OWrites}
 import play.api.mvc.{Action, AnyContent, BaseController, ControllerComponents}
 import services.ReportService
 import util.{ControllerJson, EitherF}
@@ -18,7 +21,8 @@ class ReportController @Inject() (val controllerComponents: ControllerComponents
     EitherF.response(
       for {
         topArtist <- EitherF.right(reportService.topArtistByNumberOfSessions())
-      } yield Ok(topArtist.toString)
+      } yield Ok(topArtist)
     )
   }
+
 }
