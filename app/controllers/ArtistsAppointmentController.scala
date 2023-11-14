@@ -32,12 +32,6 @@ class ArtistsAppointmentController @Inject() (
     } yield Ok(SessionResponse(sessions)))
   }
 
-  def topArtistsByWorkedHours: Action[AnyContent] = Action.async { implicit request =>
-    EitherF.response(for {
-      artists <- EitherF.right(artistAppointmentService.listTopArtistsByWorkedHours)
-    } yield Ok(ArtistResponse(artists)))
-  }
-
   private case class SessionResponse(sessions: Seq[SessionTattoo])
   private implicit val sessionResponseWrites: OWrites[SessionResponse] = Json.writes[SessionResponse]
 

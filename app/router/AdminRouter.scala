@@ -108,8 +108,11 @@ class AdminRouter @Inject() (
 
   }
 
-  private val reportRoutes: Routes = { case GET(p"/topArtistByNumberOfSessions") =>
-    reportController.topArtistByNumberOfSessions()
+  private val reportRoutes: Routes = {
+    case GET(p"/topArtistByNumberOfSessions") =>
+      reportController.topArtistByNumberOfSessions()
+    case GET(p"/topArtistByWorkedHours") =>
+        reportController.topArtistByWorkedHours()
   }
 
   val uuid = new PathBindableExtractor[UUID]

@@ -21,4 +21,14 @@ class ReportController @Inject() (val controllerComponents: ControllerComponents
       } yield Ok(topArtist.toString)
     )
   }
+
+  def topArtistByWorkedHours: Action[AnyContent] = Action.async {
+    EitherF.response(
+      for {
+        topArtist <- EitherF.right(reportService.topArtistByWorkedHours())
+      } yield Ok(topArtist.toString)
+    )
+  }
+
+
 }

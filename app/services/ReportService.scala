@@ -20,4 +20,13 @@ class ReportService @Inject() (dbService: DBService, artistAppointmentService: A
 
     } yield artistsWithSessions
   }
+
+  def topArtistByWorkedHours(): Future[Seq[(Artist, Double)]] =
+    artistService.listArtists.flatMap { artists =>
+      Future.sequence(artists.map { artist =>
+        artistAppointmentService.listSessionsByArtistId(artist.id).map { sessions =>
+          (artist, sessions.map(_.estimated_time).sum)
+        }
+      })
+    }
 }
