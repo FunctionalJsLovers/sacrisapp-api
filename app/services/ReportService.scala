@@ -1,7 +1,7 @@
 package services
 
 import com.google.inject.Inject
-import models.Artist.ArtistSessionsMonth
+import models.Artist.ArtistMap
 import models.{Artist, SessionTattoo}
 import models.Artist
 
@@ -14,23 +14,24 @@ class ReportService @Inject() (dbService: DBService, artistAppointmentService: A
   import dbService._
   import dbService.api._
 
-  def topArtistByNumberOfSessions(): Future[ArtistSessionsMonth] = {
+  def topArtistByNumberOfSessions(): Future[ArtistMap] = {
     for {
       artists <- artistService.listArtists
       artistsWithSessions <-
         Future.sequence(artists.map(artist => artistAppointmentService.listSessionsByArtistId(artist.id).map(sessions => (artist, sessions))))
       countSessionByArtist = artistsWithSessions.map(artistWithSession => (artistWithSession._1, artistWithSession._2.size)).toMap
       artistNameSession = countSessionByArtist.map(artistSession => (artistSession._1.name, artistSession._2))
-    } yield ArtistSessionsMonth(artistNameSession)
+    } yield ArtistMap(artistNameSession)
   }
 
-  def topArtistByWorkedHours(): Future[Seq[(Artist, Int)]] = {
+  def topArtistByWorkedHours(): Future[ArtistMap] = {
     for {
       artists <- artistService.listArtists
       artistsWithHours <-
         Future.sequence(
           artists.map(artist => artistAppointmentService.listSessionsByArtistId(artist.id).map(session => (artist, session.map(_.estimated_time).sum)))
         )
-    } yield artistsWithHours
+      countArtistHourMap = artistsWithHours.map(artistsWithHours => (artistsWithHours._1.name, artistsWithHours._2)).toMap
+    } yield ArtistMap(countArtistHourMap)
   }
 }
