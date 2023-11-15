@@ -14,7 +14,6 @@ class ReportService @Inject() (dbService: DBService, artistAppointmentService: A
   import dbService._
   import dbService.api._
 
-  def topArtistByNumberOfSessions(): Any = {
   def topArtistByNumberOfSessions(): Future[ArtistSessionsMonth] = {
     for {
       artists <- artistService.listArtists
@@ -25,16 +24,13 @@ class ReportService @Inject() (dbService: DBService, artistAppointmentService: A
     } yield ArtistSessionsMonth(artistNameSession)
   }
 
-
-    } yield artistsWithSessions
+  def topArtistByWorkedHours(): Future[Seq[(Artist, Int)]] = {
+    for {
+      artists <- artistService.listArtists
+      artistsWithHours <-
+        Future.sequence(
+          artists.map(artist => artistAppointmentService.listSessionsByArtistId(artist.id).map(session => (artist, session.map(_.estimated_time).sum)))
+        )
+    } yield artistsWithHours
   }
-
-  def topArtistByWorkedHours(): Future[Seq[(Artist, Double)]] =
-    artistService.listArtists.flatMap { artists =>
-      Future.sequence(artists.map { artist =>
-        artistAppointmentService.listSessionsByArtistId(artist.id).map { sessions =>
-          (artist, sessions.map(_.estimated_time).sum)
-        }
-      })
-    }
 }
