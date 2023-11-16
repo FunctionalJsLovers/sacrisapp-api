@@ -34,4 +34,6 @@ class ArtistAppointmentService @Inject() (
     actions.transactionally.execute()
   }
 
+
+
 }

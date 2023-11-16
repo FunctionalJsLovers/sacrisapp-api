@@ -34,4 +34,7 @@ class ArtistsAppointmentController @Inject() (
 
   private case class SessionResponse(sessions: Seq[SessionTattoo])
   private implicit val sessionResponseWrites: OWrites[SessionResponse] = Json.writes[SessionResponse]
+
+  private case class ArtistResponse(artists: Seq[models.Artist])
+  private implicit val artistResponseWrites: OWrites[ArtistResponse] = Json.writes[ArtistResponse]
 }
