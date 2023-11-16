@@ -33,4 +33,12 @@ class ReportController @Inject() (val controllerComponents: ControllerComponents
     )
   }
 
+  def totalSalesLast30Days: Action[AnyContent] = Action.async {
+    EitherF.response(
+      for {
+        topArtist <- EitherF.right(reportService.totalSalesLast30Days())
+      } yield Ok(topArtist)
+    )
+  }
+
 }
