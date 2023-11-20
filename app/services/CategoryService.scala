@@ -4,6 +4,7 @@ import com.google.inject.{Inject, Singleton}
 import database.Categories.{CategoriesTable, CategoriesTableDef}
 import models.Category
 
+import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
@@ -24,6 +25,13 @@ class CategoryService @Inject() (dbService: DBService)(implicit ec: ExecutionCon
     dbActions.transactionally.execute()
   }
 
+  def listCategoryByCategoryId(categoryId: UUID): Future[Seq[Category]] = {
+    CategoriesTable
+      .filter(_.id === categoryId)
+      .result
+      .execute()
+      .map(_.map(_.toCategory))
+  }
   private def createCategoryParameters(category: Category.Create): Seq[Parameter[CategoriesTableDef]] = Seq(
     Parameter((_: CategoriesTableDef).name, category.name),
   )
