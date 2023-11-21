@@ -32,4 +32,7 @@ object Appointment {
   implicit val updateAppointmentReads: Reads[Appointment.Update] =
     DESCRIPTION.map(description => Update(description))
 
+
+
+
 }

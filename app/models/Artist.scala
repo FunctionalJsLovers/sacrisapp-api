@@ -12,7 +12,8 @@ case class Artist(
     admin_id: UUID,
     description: String,
     instagram: String,
-    username: String
+    username: String,
+    categories: Seq[String] = Seq.empty,
 ) {}
 
 object Artist {

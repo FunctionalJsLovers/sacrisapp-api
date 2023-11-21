@@ -1,25 +1,59 @@
 package services
 
+import cats.implicits.toTraverseOps
 import com.google.inject.{Inject, Singleton}
 import database.Artists.{ArtistsTable, ArtistsTableDef}
+import database.ArtistsCategories
+import database.ArtistsCategories.ArtistsCategoriesTable
+import database.Categories.CategoriesTable
 import models.Artist
 
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton
-class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionContext) {
+class ArtistService @Inject() (dbService: DBService, artistCategoryService: ArtistCategoryService, categoryService: CategoryService)(implicit
+    ec: ExecutionContext
+) {
 
   import dbService._
   import dbService.api._
 
   def listArtist(artistId: UUID): Future[Option[Artist]] = {
-    ArtistsTable
+    val artist = ArtistsTable
       .filter(_.id === artistId)
+      .map(a => (a.id, a.name, a.phone, a.email, a.admin_id, a.description, a.instagram, a.username))
       .result
       .headOption
-      .execute()
-      .map(_.map(_.toArtist))
+
+    val actions = for {
+      artistOpt <- artist
+      artistCategoriesByArtist <- ArtistsCategoriesTable
+        .filter(_.artist_id === artistId)
+        .join(ArtistsTable)
+        .on(_.artist_id === _.id)
+        .map(_._1.category_id)
+        .result
+
+      artistCategories <- CategoriesTable
+        .filter(_.id inSet artistCategoriesByArtist)
+        .map(_.name)
+        .result
+
+    } yield artistOpt.map { case (i, n, p, e, ad, d, ig, u) =>
+      Artist(
+        i,
+        n,
+        p,
+        e,
+        ad,
+        d,
+        ig,
+        u,
+        artistCategories
+      )
+    }
+    actions.execute()
   }
 
   def listArtists: Future[Seq[Artist]] = {
@@ -56,7 +90,6 @@ class ArtistService @Inject() (dbService: DBService)(implicit ec: ExecutionConte
     val query = ArtistsTable.filter(_.email === email).length
     query.result.map(_ <= 0).execute()
   }
-
 
   private def createArtistParameters(artist: Artist.Create): Seq[Parameter[ArtistsTableDef]] = Seq(
     Parameter((_: ArtistsTableDef).name, artist.name),

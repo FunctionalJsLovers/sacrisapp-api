@@ -115,6 +115,8 @@ class AdminRouter @Inject() (
         reportController.topArtistByWorkedHours()
     case GET(p"/totalSalesLast30Days") =>
         reportController.totalSalesLast30Days()
+    case GET(p"/topCategoriesMonth") =>
+        reportController.topCategoriesMonth()
   }
 
   val uuid = new PathBindableExtractor[UUID]

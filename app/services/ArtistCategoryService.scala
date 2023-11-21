@@ -24,6 +24,14 @@ class ArtistCategoryService @Inject() (dbService: DBService)(implicit ec: Execut
     dbActions.transactionally.execute()
   }
 
+  def listArtistCategoryByArtistId(artistId: UUID): Future[Seq[ArtistCategory]] = {
+    ArtistsCategoriesTable
+      .filter(_.artist_id === artistId)
+      .result
+      .execute()
+      .map(_.map(_.toArtistsCategory))
+  }
+
   private def createArtistCategoryParameters(artistCategory: ArtistCategory.Create): Seq[Parameter[ArtistsCategoriesTableDef]] = Seq(
     Parameter((_: ArtistsCategoriesTableDef).artist_id, UUID.fromString(artistCategory.artist_id)),
     Parameter((_: ArtistsCategoriesTableDef).category_id, UUID.fromString(artistCategory.category_id))
