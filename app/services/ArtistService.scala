@@ -25,19 +25,20 @@ class ArtistService @Inject() (dbService: DBService, artistCategoryService: Arti
       .map(a => (a.id, a.name, a.phone, a.email, a.admin_id, a.description, a.instagram, a.username))
       .result
       .headOption
+
     val actions = for {
       artistOpt <- artist
       artistCategoriesByArtist <- ArtistsCategoriesTable
-                                    .filter(_.artist_id === artistId)
-                                    .join(ArtistsTable)
-                                    .on(_.artist_id === _.id)
-                                    .map(_._1.category_id)
-                                    .result
+        .filter(_.artist_id === artistId)
+        .join(ArtistsTable)
+        .on(_.artist_id === _.id)
+        .map(_._1.category_id)
+        .result
 
       artistCategories <- CategoriesTable
-                            .filter(_.id inSet artistCategoriesByArtist)
-                            .map(_.name)
-                            .result
+        .filter(_.id inSet artistCategoriesByArtist)
+        .map(_.name)
+        .result
 
     } yield artistOpt.map { case (i, n, p, e, ad, d, ig, u) =>
       Artist(

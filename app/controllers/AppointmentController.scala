@@ -38,7 +38,7 @@ class AppointmentController @Inject() (
     } yield Ok(AppointmentResponse(appointments)))
   }
 
-  def createAppointment(): Action[Appointment.Create] = Action.async(parse.json[Appointment.Create]) { implicit request =>
+  def createAppointment(): Action[Appointment.Create] = Action.async(jsonParser[Appointment.Create]("appointment")) { implicit request =>
     val verifyArtistAndClient = appointmentService.verifyArtistAndClient(UUID.fromString(request.body.artist_id), UUID.fromString(request.body.client_id))
     EitherF.response(for {
       artist <- EitherF.getOrElse(artistService.listArtist(UUID.fromString(request.body.artist_id)), NotFound)
