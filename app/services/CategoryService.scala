@@ -37,7 +37,6 @@ class CategoryService @Inject() (dbService: DBService)(implicit ec: ExecutionCon
   }
 
   def listCategoriesByIds(categoriesIds: Seq[UUID]): Future[Seq[Category]] = {
-    println("category ids_> " + categoriesIds)
     CategoriesTable
       .filter(_.id inSet categoriesIds)
       .result
