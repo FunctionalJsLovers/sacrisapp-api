@@ -14,6 +14,7 @@ class ReportService @Inject() (
     dbService: DBService,
     artistAppointmentService: ArtistAppointmentService,
     artistService: ArtistService,
+    artistCategoryService: ArtistCategoryService,
     appointmentService: AppointmentService,
     categoryService: CategoryService
 )(implicit
@@ -67,7 +68,7 @@ class ReportService @Inject() (
     } yield ArtistMap(artistSalesMap)
   }
 
-  def topCategoriesByMonth(): Future[CategoryMap] = {
+  /**def topCategoriesByMonth(): Future[CategoryMap] = {
     for {
       artists <- artistService.listArtists
       artistsWithAppointments <-
@@ -86,6 +87,22 @@ class ReportService @Inject() (
       sortedRepetitionsCountMap: Map[Int, UUID] = sortedSequence.toMap
 
     } yield CategoryMap(sortedRepetitionsCountMap)
+  }**/
+
+  def topCategories(): Future[CategoryMap] = {
+    for {
+      appointments <- appointmentService.listAppointments
+      categories <- categoryService.listCategories
+      artistCategories <- artistCategoryService.listArtistCategory
+      artistCategoriesIds = appointments.map(_.category_id)
+      categoriesIds = artistCategoriesIds.map(id => artistCategories.find(_.id == id).get.category_id)
+      categoriesCountMap = categories.map(category =>{
+        val categoryName = category.name
+        val categoryCount = categoriesIds.count(_ == category.id)
+        (categoryName, categoryCount)
+        }).toMap
+    } yield CategoryMap(categoriesCountMap)
   }
+
 
 }
