@@ -15,6 +15,6 @@ object Category {
   case class Create(name: String) {}
   implicit val categoryCreateReads: Reads[Create] = Json.reads[Create]
 
-  case class CategoryMap(category: Map[Int, UUID])
+  case class CategoryMap(category: Map[String, Int])
   implicit val categoryResponseWrites: OWrites[CategoryMap] = Json.writes[CategoryMap]
 }

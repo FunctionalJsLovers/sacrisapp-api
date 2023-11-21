@@ -41,10 +41,18 @@ class ReportController @Inject() (val controllerComponents: ControllerComponents
     )
   }
 
-  def topCategoriesMonth: Action[AnyContent] = Action.async {
+  /**def topCategoriesMonth: Action[AnyContent] = Action.async {
     EitherF.response(
       for {
         topCategories <- EitherF.right(reportService.topCategoriesByMonth())
+      } yield Ok(topCategories)
+    )
+  }**/
+
+  def topCategories: Action[AnyContent] = Action.async {
+    EitherF.response(
+      for {
+        topCategories <- EitherF.right(reportService.topCategories())
       } yield Ok(topCategories)
     )
   }
