@@ -6,6 +6,7 @@ import database.Artists.{ArtistsTable, ArtistsTableDef}
 import database.Sessions.SessionsTable
 import models.{Appointment, Artist, SessionTattoo}
 
+import java.time.LocalDateTime
 import java.util.UUID
 import scala.concurrent.{ExecutionContext, Future}
 
@@ -34,6 +35,19 @@ class ArtistAppointmentService @Inject() (
     actions.transactionally.execute()
   }
 
-
+  def listSessionsByArtistIdInATimeRange(artistId: UUID, startDate: LocalDateTime, endDate: LocalDateTime): Future[Seq[SessionTattoo]] = {
+    val actions = for {
+      query <- AppointmentsTable
+                 .filter(_.artistId === artistId)
+                 .join(SessionsTable)
+                 .on(_.id === _.appointmentId)
+                 .map { case (appointment, session) => (appointment.id, session) }
+                 .filter { case (_, session) => session.date >= startDate && session.date <= endDate }
+                 .result
+      appointmentSessionList = query.groupMap(_._1)(_._2)
+      toSession = appointmentSessionList.values.flatten.map(_.toSession).toSeq
+    } yield toSession
+    actions.transactionally.execute()
+  }
 
 }
