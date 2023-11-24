@@ -113,8 +113,8 @@ class AdminRouter @Inject() (
       reportController.topArtistByNumberOfSessions()
     case GET(p"/topArtistByWorkedHours") =>
         reportController.topArtistByWorkedHours()
-    case GET(p"/totalSalesLast30Days") =>
-        reportController.totalSalesLast30Days()
+    case GET(p"/totalSales") =>
+        reportController.totalSales()
     case GET(p"/topCategoriesMonth") =>
         reportController.topCategories()
   }

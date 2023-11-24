@@ -28,18 +28,22 @@ class ReportController @Inject() (val controllerComponents: ControllerComponents
     )
   }
 
-  def topArtistByWorkedHours: Action[AnyContent] = Action.async {
+  def topArtistByWorkedHours: Action[AnyContent] = Action.async { implicit request =>
+    val startDate = LocalDateTime.parse(request.getQueryString("startDate").getOrElse("2023-09-01T00:00:00"))
+    val endDate = LocalDateTime.parse(request.getQueryString("endDate").getOrElse("2023-10-01T00:00:00"))
     EitherF.response(
       for {
-        topArtist <- EitherF.right(reportService.topArtistByWorkedHours())
+        topArtist <- EitherF.right(reportService.topArtistByWorkedHours(startDate, endDate))
       } yield Ok(topArtist)
     )
   }
 
-  def totalSalesLast30Days: Action[AnyContent] = Action.async {
+  def totalSales: Action[AnyContent] = Action.async { implicit request =>
+    val startDate = LocalDateTime.parse(request.getQueryString("startDate").getOrElse("2023-09-01T00:00:00"))
+    val endDate = LocalDateTime.parse(request.getQueryString("endDate").getOrElse("2023-10-01T00:00:00"))
     EitherF.response(
       for {
-        totalSales <- EitherF.right(reportService.totalSalesLast30Days())
+        totalSales <- EitherF.right(reportService.totalSales(startDate, endDate))
       } yield Ok(totalSales)
     )
   }

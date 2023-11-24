@@ -36,33 +36,26 @@ class ReportService @Inject() (
     } yield ArtistMap(artistNameSession)
   }
 
-  def topArtistByWorkedHours(): Future[ArtistMap] = {
+  def topArtistByWorkedHours(startDate:LocalDateTime, endDate:LocalDateTime): Future[ArtistMap] = {
     for {
       artists <- artistService.listArtists
       artistsWithHours <-
-        Future.sequence(
-          artists.map(artist => artistAppointmentService.listSessionsByArtistId(artist.id).map(session => (artist, session.map(_.estimated_time).sum)))
+        Future.sequence(artists.map(artist =>
+          artistAppointmentService.listSessionsByArtistIdInATimeRange(artist.id, startDate, endDate)
+            .map(session => (artist, session.map(_.estimated_time).sum)))
         )
       countArtistHourMap = artistsWithHours.map(artistsWithHours => (artistsWithHours._1.name, artistsWithHours._2)).toMap
     } yield ArtistMap(countArtistHourMap)
   }
 
-  def totalSalesLast30Days(): Future[ArtistMap] = {
-    val thirtyDaysAgo = LocalDateTime.now().minusDays(30)
-
+  def totalSales(startDate:LocalDateTime, endDate:LocalDateTime): Future[ArtistMap] = {
     for {
       artists <- artistService.listArtists
       artistsWithSales <-
         Future.sequence(
           artists.map { artist =>
-            artistAppointmentService
-              .listSessionsByArtistId(artist.id)
-              .map { sessions =>
-                val salesLast30Days = sessions
-                  .filter(session => session.date.isAfter(thirtyDaysAgo))
-                  .map(_.price)
-                  .sum
-                (artist, salesLast30Days)
+            artistAppointmentService.listSessionsByArtistIdInATimeRange(artist.id, startDate, endDate)
+              .map { sessions => (artist, sessions.map(_.price).sum)
               }
           }
         )
