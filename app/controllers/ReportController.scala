@@ -9,7 +9,6 @@ import services.ReportService
 import util.{ControllerJson, EitherF}
 import utils.ControllerUtil
 
-import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -18,32 +17,26 @@ class ReportController @Inject() (val controllerComponents: ControllerComponents
     with ControllerJson
     with ControllerUtil {
 
-  def topArtistByNumberOfSessions(): Action[AnyContent] = Action.async { implicit request =>
-    val startDate = LocalDateTime.parse(request.getQueryString("startDate").getOrElse("2023-09-01T00:00:00"))
-    val endDate = LocalDateTime.parse(request.getQueryString("endDate").getOrElse("2023-10-01T00:00:00"))
+  def topArtistByNumberOfSessions: Action[AnyContent] = Action.async {
     EitherF.response(
       for {
-        topArtist <- EitherF.right(reportService.topArtistByNumberOfSessions(startDate, endDate))
+        topArtist <- EitherF.right(reportService.topArtistByNumberOfSessions())
       } yield Ok(topArtist)
     )
   }
 
-  def topArtistByWorkedHours: Action[AnyContent] = Action.async { implicit request =>
-    val startDate = LocalDateTime.parse(request.getQueryString("startDate").getOrElse("2023-09-01T00:00:00"))
-    val endDate = LocalDateTime.parse(request.getQueryString("endDate").getOrElse("2023-10-01T00:00:00"))
+  def topArtistByWorkedHours: Action[AnyContent] = Action.async {
     EitherF.response(
       for {
-        topArtist <- EitherF.right(reportService.topArtistByWorkedHours(startDate, endDate))
+        topArtist <- EitherF.right(reportService.topArtistByWorkedHours())
       } yield Ok(topArtist)
     )
   }
 
-  def totalSales: Action[AnyContent] = Action.async { implicit request =>
-    val startDate = LocalDateTime.parse(request.getQueryString("startDate").getOrElse("2023-09-01T00:00:00"))
-    val endDate = LocalDateTime.parse(request.getQueryString("endDate").getOrElse("2023-10-01T00:00:00"))
+  def totalSalesLast30Days: Action[AnyContent] = Action.async {
     EitherF.response(
       for {
-        totalSales <- EitherF.right(reportService.totalSales(startDate, endDate))
+        totalSales <- EitherF.right(reportService.totalSalesLast30Days())
       } yield Ok(totalSales)
     )
   }
