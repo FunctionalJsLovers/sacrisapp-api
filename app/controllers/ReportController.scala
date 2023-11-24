@@ -9,6 +9,7 @@ import services.ReportService
 import util.{ControllerJson, EitherF}
 import utils.ControllerUtil
 
+import java.time.LocalDateTime
 import scala.concurrent.ExecutionContext
 
 @Singleton
@@ -17,10 +18,12 @@ class ReportController @Inject() (val controllerComponents: ControllerComponents
     with ControllerJson
     with ControllerUtil {
 
-  def topArtistByNumberOfSessions: Action[AnyContent] = Action.async {
+  def topArtistByNumberOfSessions(): Action[AnyContent] = Action.async { implicit request =>
+    val startDate = LocalDateTime.parse(request.getQueryString("startDate").getOrElse("2023-09-01T00:00:00"))
+    val endDate = LocalDateTime.parse(request.getQueryString("endDate").getOrElse("2023-10-01T00:00:00"))
     EitherF.response(
       for {
-        topArtist <- EitherF.right(reportService.topArtistByNumberOfSessions())
+        topArtist <- EitherF.right(reportService.topArtistByNumberOfSessions(startDate, endDate))
       } yield Ok(topArtist)
     )
   }

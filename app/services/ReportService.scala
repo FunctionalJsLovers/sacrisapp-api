@@ -24,11 +24,13 @@ class ReportService @Inject() (
   import dbService._
   import dbService.api._
 
-  def topArtistByNumberOfSessions(): Future[ArtistMap] = {
+  def topArtistByNumberOfSessions(startDate: LocalDateTime, endDate:LocalDateTime): Future[ArtistMap] = {
     for {
       artists <- artistService.listArtists
       artistsWithSessions <-
-        Future.sequence(artists.map(artist => artistAppointmentService.listSessionsByArtistId(artist.id).map(sessions => (artist, sessions))))
+        Future.sequence(artists.map(artist =>
+          artistAppointmentService.listSessionsByArtistIdInATimeRange(artist.id, startDate, endDate)
+            .map(sessions => (artist, sessions))))
       countSessionByArtist = artistsWithSessions.map(artistWithSession => (artistWithSession._1, artistWithSession._2.size)).toMap
       artistNameSession = countSessionByArtist.map(artistSession => (artistSession._1.name, artistSession._2))
     } yield ArtistMap(artistNameSession)
